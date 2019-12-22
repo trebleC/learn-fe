@@ -2,6 +2,7 @@ const {createServer} = require('http')
 const url = require('url')
 const methods = require('methods')
 const fs = require('fs')
+const path = require('path')
 
 const application = () => {
     const routes = []
@@ -160,6 +161,20 @@ const application = () => {
     }
 
     return app
+}
+
+application.static = root => (req, res, next) => {
+    const p = req.pathname
+    const absPath = path.join(root, p)
+    fs.stat(absPath, (err, fileInfo) => {
+        if (err) {
+            next();
+        } else {
+            if (fileInfo.isFile()) {
+                fs.createReadStream(absPath).pipe(res)
+            }
+        }
+    })
 }
 
 module.exports = application

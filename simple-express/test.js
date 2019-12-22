@@ -8,6 +8,8 @@ const conf = {
 
 const app = express()
 
+app.use(express.static(path.resolve(__dirname, 'public')))
+
 app.use((req, res, next) => {
     console.log(1)
     next()
@@ -24,8 +26,7 @@ app.use((req, res, next) => {
 })
 
 app.get('/', (req, res) => {
-    // res.send('234')
-    res.sendFile(path.resolve(__dirname, './public/index.html'))
+    res.send('234')
 })
 
 app.post('/', (req, res) => {

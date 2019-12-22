@@ -7,14 +7,23 @@ class Promise {
         this.status = PENDING
         this.value = null
 
+        this.onResolvedCallbacks = []
+        this.onRejectedCallbacks = []
+
         const resolve = value => {
-            this.value = value
-            this.status = RESOLVED
+            if (this.status === PENDING) {
+                this.value = value
+                this.status = RESOLVED
+                this.onResolvedCallbacks.forEach(fn => fn())
+            }
         }
 
         const reject = reason => {
-            this.reason = reason
-            this.status = REJECTED
+            if (this.status === PENDING) {
+                this.reason = reason
+                this.status = REJECTED
+                this.onRejectedCallbacks.forEach(fn => fn())
+            }
         }
 
         excutor(resolve, reject)
@@ -28,11 +37,18 @@ class Promise {
         if (this.status === REJECTED) {
             onRejected(this.reason)
         }
+
+        if (this.status === PENDING) {
+            this.onResolvedCallbacks.push(() => onFulfilled(this.value))
+            this.onRejectedCallbacks.push(() => onRejected(this.reason))
+        }
     }
 }
 
 const p = new Promise(resolve => {
-    resolve('好呀~')
+    setTimeout(() => {
+        resolve('好呀~')
+    }, 1e3);
 })
 
 p.then(result => {

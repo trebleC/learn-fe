@@ -45,16 +45,4 @@ class Promise {
     }
 }
 
-const p = new Promise((resolve, reject) => {
-    setTimeout(() => {
-        reject('不行~')
-    }, 1e3);
-})
-
-p.then(result => {
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 result: `, result)
-}, reason => {
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 reason: `, reason)
-})
-
-// export default Promise
+module.exports = Promise

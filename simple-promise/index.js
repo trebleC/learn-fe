@@ -23,6 +23,10 @@ class Promise {
         this.onRejectedCallbacks = []
 
         const resolve = value => {
+            if (value instanceof Promise) {
+                return value.then(data => resolve(data), err => reject(err))
+            }
+
             if (this.status === PENDING) {
                 this.value = value
                 this.status = RESOLVED
@@ -101,7 +105,7 @@ class Promise {
 
 const p = new Promise((resolve, reject) => {
     console.log(`当前时间 ${Date.now()}: 代码走到了这里 开始`)
-    resolve('第一步')
+    resolve(new Promise(resolve => (resolve('第一步'))))
 })
 
 p.then(data => {

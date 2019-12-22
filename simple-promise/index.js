@@ -30,6 +30,9 @@ class Promise {
     }
 
     then(onFulfilled, onRejected) {
+        onFulfilled = typeof onFulfilled === 'function'  ? onFulfilled : v => v
+        onRejected = typeof onRejected === 'function'  ? onRejected : e => {throw e}
+
         const promise2 = new Promise((resolve, reject) => {
             if (this.status === RESOLVED) {
                 const x = onFulfilled(this.value)

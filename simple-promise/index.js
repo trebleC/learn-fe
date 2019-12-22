@@ -119,5 +119,15 @@ p.then(data => {
     console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
 })
 
+// 这个静态方法必须得用普通函数的书写方式
+Promise.defer = Promise.deferred = function () {
+    const dfd = {}
+    dfd.promise = new Promise((resolve, reject) => {
+      dfd.resolve = resolve
+      dfd.reject = reject
+    })
+    return dfd
+}
+
 
 module.exports = Promise

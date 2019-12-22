@@ -35,14 +35,6 @@ const application = () => {
         }
     })
 
-    app.get = (path, handler) => {
-        const layer = {
-            path, handler, method: 'get'
-        }
-
-        routes.push(layer)
-    }
-
     app.listen = (...args) => {
         createServer(app).listen(...args);
     }

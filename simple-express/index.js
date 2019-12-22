@@ -9,7 +9,7 @@ const application = () => {
         let idx = 0
         const {pathname} = url.parse(req.url)
         const method = req.method.toLowerCase()
-        const next = () => {
+        const next = err => {
             if (idx === routes.length) {
                 res.statusCode = 404;
                 res.end('404')
@@ -17,6 +17,14 @@ const application = () => {
             }
 
             const {handler, path, method: mtd} = routes[idx++]
+
+            if (err) {
+                if (mtd === 'middleware' && handler.length === 4) {
+                    handler(err, req, res, next)
+                } else {
+                    next(err)
+                }
+            } else {
             // 中间件
             if (mtd === 'middleware') {
                 if (
@@ -66,6 +74,7 @@ const application = () => {
 
                 // 路由没有匹配到直接 next
                 next()
+            }
             }
         }
 

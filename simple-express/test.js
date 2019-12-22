@@ -9,7 +9,7 @@ const app = express()
 
 app.use((req, res, next) => {
     console.log(1)
-    next()
+    next('boom~')
 })
 
 app.use((req, res, next) => {
@@ -35,9 +35,12 @@ app.get('/user/:id/:name', (req, res) => {
     res.end(JSON.stringify({id, name}))
 })
 
-// app.all('*', (req, res) => {
-//     res.end('all *')
-// })
+app.use((err, req, res, next) => {
+    if (err) {
+        res.end('something Error')
+        next(err)
+    }
+})
 
 
 app.listen(conf.PORT, () => {

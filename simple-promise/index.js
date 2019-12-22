@@ -8,6 +8,8 @@ const resolvePromise = (promise2, x, resolve, reject) => {
 
         if (typeof then === 'function') {
             then.call(x, y => resolve(y), r => reject(r))
+        } else {
+            resolve(x)
         }
     } else {
         resolve(x)
@@ -110,7 +112,7 @@ const p = new Promise((resolve, reject) => {
 
 p.then(data => {
     console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
-    return new Promise(resolve => resolve('第二步'))
+    return {name: 'quanquan'} // new Promise(resolve => resolve({name: 'quanquan'}))
 }, err => {
     console.log(`当前时间 ${Date.now()}: debug 的数据是 err: `, err)
 }).then(data => {

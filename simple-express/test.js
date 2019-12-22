@@ -7,6 +7,21 @@ const conf = {
 
 const app = express()
 
+app.use((req, res, next) => {
+    console.log(1)
+    next()
+})
+
+app.use((req, res, next) => {
+    console.log(2)
+    next()
+})
+
+app.use((req, res, next) => {
+    console.log(3)
+    next()
+})
+
 app.get('/', (req, res) => {
     res.end('home')
 })
@@ -17,7 +32,6 @@ app.post('/', (req, res) => {
 
 app.get('/user/:id/:name', (req, res) => {
     const {params: {id, name}} = req
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 id, name: `, id, name)
     res.end(JSON.stringify({id, name}))
 })
 

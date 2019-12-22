@@ -4,6 +4,9 @@ const REJECTED = 'REJECTED'
 
 const resolvePromise = (promise2, x, resolve, reject) => {
     let called = false
+
+    if (promise2 === x) throw new TypeError('Circular reference')
+
     if ((typeof x === 'object' && x !== null) || typeof x === 'function') {
         try {
             const {then} = x

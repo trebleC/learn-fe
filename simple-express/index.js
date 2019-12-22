@@ -172,6 +172,8 @@ application.static = root => (req, res, next) => {
         } else {
             if (fileInfo.isFile()) {
                 fs.createReadStream(absPath).pipe(res)
+            } else {
+                next()
             }
         }
     })

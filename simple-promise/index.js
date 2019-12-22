@@ -2,6 +2,17 @@ const PENDING = 'PENDING'
 const RESOLVED = 'RESOLVED'
 const REJECTED = 'REJECTED'
 
+const resolvePromise = (promise2, x, resolve, reject) => {
+    if ((typeof x === 'object' && x !== null) || typeof x === 'function') {
+        const {then} = x
+
+        if (typeof then === 'function') {
+            then.call(x, y => resolve(y), r => reject(r))
+        }
+    } else {
+        resolve(x)
+    }
+}
 class Promise {
     constructor(excutor) {
         this.status = PENDING
@@ -39,23 +50,47 @@ class Promise {
 
         const promise2 = new Promise((resolve, reject) => {
             if (this.status === RESOLVED) {
-                const x = onFulfilled(this.value)
-                resolve(x)
+                setTimeout(() => {
+                    try {
+                        const x = onFulfilled(this.value)
+                        resolvePromise(promise2, x, resolve, reject)
+                    } catch (e) {
+                        reject(e)
+                    }
+                }, 0);
             }
 
             if (this.status === REJECTED) {
-                const r = onRejected(this.reason)
-                reject(r)
+                setTimeout(() => {
+                    try {
+                        const r = onRejected(this.reason)
+                        resolvePromise(promise2, r, resolve, reject)
+                    } catch (e) {
+                        reject(e)
+                    }
+                }, 0);
             }
 
             if (this.status === PENDING) {
                 this.onResolvedCallbacks.push(() => {
-                    const x = onFulfilled(this.value)
-                    resolve(x)
+                    setTimeout(() => {
+                        try {
+                            const x = onFulfilled(this.value)
+                            resolvePromise(promise2, x, resolve, reject)
+                          } catch (e) {
+                            reject(e)
+                          }
+                    }, 0);
                 })
                 this.onRejectedCallbacks.push(() => {
-                    const r = onRejected(this.reason)
-                    reject(r)
+                    setTimeout(() => {
+                        try {
+                          const r = onRejected(this.reason)
+                          resolvePromise(promise2, r, resolve, reject)
+                        } catch (e) {
+                          reject(e)
+                        }
+                    }, 0)
                 })
             }
         })
@@ -66,14 +101,16 @@ class Promise {
 
 const p = new Promise((resolve, reject) => {
     console.log(`当前时间 ${Date.now()}: 代码走到了这里 开始`)
-    throw Error('Error')
+    resolve('第一步')
 })
 
 p.then(data => {
     console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
-    return '第二步'
+    return new Promise(resolve => resolve('第二步'))
 }, err => {
     console.log(`当前时间 ${Date.now()}: debug 的数据是 err: `, err)
+}).then(data => {
+    console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
 })
 
 

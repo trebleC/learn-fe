@@ -1,6 +1,7 @@
 const {createServer} = require('http')
 const url = require('url')
 const methods = require('methods')
+const fs = require('fs')
 
 const application = () => {
     const routes = []
@@ -145,6 +146,10 @@ const application = () => {
             }
 
             sendMap[curType] ? sendMap[curType](value) : sendMap['string'](value)
+        }
+
+        res.sendFile = p => {
+            fs.createReadStream(p).pipe(res)
         }
 
         next()

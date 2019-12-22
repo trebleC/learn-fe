@@ -1,5 +1,6 @@
 // const express = require('express')
 const express = require('./index')
+const path = require('path')
 
 const conf = {
     PORT: 3001
@@ -23,7 +24,8 @@ app.use((req, res, next) => {
 })
 
 app.get('/', (req, res) => {
-    res.send('234')
+    // res.send('234')
+    res.sendFile(path.resolve(__dirname, './public/index.html'))
 })
 
 app.post('/', (req, res) => {

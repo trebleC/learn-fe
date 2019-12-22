@@ -13,6 +13,7 @@ const application = () => {
             if (idx === routes.length) {
                 res.statusCode = 404;
                 res.end('404')
+                return
             }
 
             const {handler, path, method: mtd} = routes[idx++]
@@ -82,7 +83,7 @@ const application = () => {
                     return '([^ \/]*)'
                 })
 
-                path = new RegExp(path)
+                path = new RegExp(`^${path}$`)
                 path.params = params
             }
 

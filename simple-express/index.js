@@ -1,5 +1,6 @@
 const {createServer} = require('http')
 const url = require('url')
+const methods = require('methods')
 
 const application = () => {
     const routes = []
@@ -18,7 +19,15 @@ const application = () => {
         }
     }
 
+    methods.forEach(method => {
+        app[method] = (path, handler) => {
+            const layer = {
+                path, handler, method
+            }
 
+            routes.push(layer)
+        }
+    })
 
     app.get = (path, handler) => {
         const layer = {

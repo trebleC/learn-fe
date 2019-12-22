@@ -10,6 +10,11 @@ const application = () => {
         const {pathname} = url.parse(req.url)
         const method = req.method.toLowerCase()
         const next = () => {
+            if (idx === routes.length) {
+                res.statusCode = 404;
+                res.end('404')
+            }
+
             const {handler, path, method: mtd} = routes[idx++]
             // 中间件
             if (mtd === 'middleware') {

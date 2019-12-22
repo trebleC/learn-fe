@@ -35,9 +35,9 @@ app.get('/user/:id/:name', (req, res) => {
     res.end(JSON.stringify({id, name}))
 })
 
-app.all('*', (req, res) => {
-    res.end('all *')
-})
+// app.all('*', (req, res) => {
+//     res.end('all *')
+// })
 
 
 app.listen(conf.PORT, () => {

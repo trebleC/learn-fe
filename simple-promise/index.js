@@ -6,6 +6,7 @@ class Promise {
     constructor(excutor) {
         this.status = PENDING
         this.value = null
+        this.reason = null
 
         this.onResolvedCallbacks = []
         this.onRejectedCallbacks = []

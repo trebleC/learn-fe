@@ -15,18 +15,9 @@ const readFile = filePath => new Promise((resolve, reject) => {
     })
 })
 
-readFile('1').then(data => {
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
-    readFile(data).then(data => {
+readFile('1')
+    .then(data => readFile(data))
+    .then(data => readFile(data))
+    .then(data => {
         console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
-        readFile(data).then(data => {
-            console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
-        }, err => {
-            console.log(`当前时间 ${Date.now()}: debug 的数据是 err: `, err)
-        })
-    }, err => {
-        console.log(`当前时间 ${Date.now()}: debug 的数据是 err: `, err)
     })
-}, err => {
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 err: `, err)
-})

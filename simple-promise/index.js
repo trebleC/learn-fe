@@ -3,13 +3,28 @@ const RESOLVED = 'RESOLVED'
 const REJECTED = 'REJECTED'
 
 const resolvePromise = (promise2, x, resolve, reject) => {
+    let called = false
     if ((typeof x === 'object' && x !== null) || typeof x === 'function') {
-        const {then} = x
+        try {
+            const {then} = x
 
-        if (typeof then === 'function') {
-            then.call(x, y => resolve(y), r => reject(r))
-        } else {
-            resolve(x)
+            if (typeof then === 'function') {
+                then.call(x, y => {
+                    if (called) return
+                    called = true
+                    resolvePromise(promise2, y, resolve, reject)
+                }, r => {
+                    if (called) return
+                    called = true
+                    reject(r)
+                })
+            } else {
+                resolve(x)
+            }
+        } catch (e) {
+            if (called) return
+            called = true
+            reject(e)
         }
     } else {
         resolve(x)

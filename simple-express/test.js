@@ -15,6 +15,10 @@ app.post('/', (req, res) => {
     res.end('post home')
 })
 
+app.all('*', (req, res) => {
+    res.end('all *')
+})
+
 
 app.listen(conf.PORT, () => {
     console.log(`The Server Is Staring On ${conf.PORT}`)

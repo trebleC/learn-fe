@@ -9,7 +9,13 @@ const application = () => {
         const {pathname} = url.parse(req.url)
         const method = req.method.toLowerCase()
 
-        const curLayer = routes.find(handler => handler.method === method && handler.path === pathname)
+        const curLayer = routes.find(handler =>
+            // 如果当前的请求路劲和预制的路由的路径相等或者预制了所有路径路由
+            (handler.path === pathname || handler.path === '*')
+            // 查看请求方法
+            && handler.method === method
+            || handler.method === 'all'
+        )
 
         if (curLayer) {
             curLayer.handler(req, res)
@@ -19,7 +25,7 @@ const application = () => {
         }
     }
 
-    methods.forEach(method => {
+    ['all', ...methods].forEach(method => {
         app[method] = (path, handler) => {
             const layer = {
                 path, handler, method

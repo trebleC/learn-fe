@@ -119,6 +119,37 @@ const application = () => {
         routes.push(layer)
     }
 
+    // 内置中间件
+    app.use((req, res, next) => {
+        const {pathname, query} = url.parse(req.url, true)
+        req.pathname = pathname
+        req.query = query
+
+        res.send = value => {
+            const curType = typeof value
+
+            const sendMap = {
+                number() {
+                    const status = require('_http_server').STATUS_CODES
+                    res.statusCode = value
+                    res.end(status[value])
+                },
+                object() {
+                    res.setHeader('Content-Type', 'application/json;charset=utf-8')
+                    res.end(JSON.stringify(value))
+                },
+                string() {
+                    res.setHeader('Content-Type', 'text/html;charset=utf-8')
+                    res.end(value)
+                }
+            }
+
+            sendMap[curType] ? sendMap[curType](value) : sendMap['string'](value)
+        }
+
+        next()
+    })
+
     app.listen = (...args) => {
         createServer(app).listen(...args);
     }

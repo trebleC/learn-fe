@@ -30,19 +30,49 @@ class Promise {
     }
 
     then(onFulfilled, onRejected) {
-        if (this.status === RESOLVED) {
-            onFulfilled(this.value)
-        }
+        const promise2 = new Promise((resolve, reject) => {
+            if (this.status === RESOLVED) {
+                const x = onFulfilled(this.value)
+                resolve(x)
+            }
 
-        if (this.status === REJECTED) {
-            onRejected(this.reason)
-        }
+            if (this.status === REJECTED) {
+                const r = onRejected(this.reason)
+                reject(r)
+            }
 
-        if (this.status === PENDING) {
-            this.onResolvedCallbacks.push(() => onFulfilled(this.value))
-            this.onRejectedCallbacks.push(() => onRejected(this.reason))
-        }
+            if (this.status === PENDING) {
+                this.onResolvedCallbacks.push(() => {
+                    const x = onFulfilled(this.value)
+                    resolve(x)
+                })
+                this.onRejectedCallbacks.push(() => {
+                    const r = onRejected(this.reason)
+                    reject(r)
+                })
+            }
+        })
+
+        return promise2
     }
 }
+
+const p = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        console.log(`当前时间 ${Date.now()}: 代码走到了这里 开始`)
+        resolve('第一步')
+    }, 1e3);
+})
+
+p.then(data => {
+    console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
+    return '第二步'
+}).then(data => {
+    console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
+    return '第三步'
+}).then(data => {
+    console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
+})
+
 
 module.exports = Promise

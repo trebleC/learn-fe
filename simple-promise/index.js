@@ -26,9 +26,12 @@ class Promise {
             }
         }
 
-        excutor(resolve, reject)
+        try {
+            excutor(resolve, reject)
+        } catch(e) {
+            reject(e)
+        }
     }
-
     then(onFulfilled, onRejected) {
         onFulfilled = typeof onFulfilled === 'function'  ? onFulfilled : v => v
         onRejected = typeof onRejected === 'function'  ? onRejected : e => {throw e}
@@ -61,20 +64,15 @@ class Promise {
 }
 
 const p = new Promise((resolve, reject) => {
-    setTimeout(() => {
-        console.log(`当前时间 ${Date.now()}: 代码走到了这里 开始`)
-        resolve('第一步')
-    }, 1e3);
+    console.log(`当前时间 ${Date.now()}: 代码走到了这里 开始`)
+    throw Error('Error')
 })
 
 p.then(data => {
     console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
     return '第二步'
-}).then(data => {
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
-    return '第三步'
-}).then(data => {
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
+}, err => {
+    console.log(`当前时间 ${Date.now()}: debug 的数据是 err: `, err)
 })
 
 

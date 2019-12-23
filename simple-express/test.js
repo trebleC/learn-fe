@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
 })
 
 app.post('/', (req, res) => {
-    res.end('post home')
+    res.send(req.body)
 })
 
 app.get('/user/:id/:name', (req, res) => {

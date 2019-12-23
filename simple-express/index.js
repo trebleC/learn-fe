@@ -3,6 +3,8 @@ const url = require('url')
 const methods = require('methods')
 const fs = require('fs')
 const path = require('path')
+const typeis = require('type-is')
+const qs = require('querystring')
 
 const application = () => {
     const routes = []
@@ -154,6 +156,32 @@ const application = () => {
         }
 
         next()
+    })
+
+    // 实现一个极简版本的 body-parser
+    app.use((req, res, next) => {
+        const {method} = req
+
+        if (req.method === 'POST') {
+            let data = ''
+
+            req.on('data', chunk => { data += chunk })
+            req.on('end', () => {
+                try {
+                    if (typeis(req, ['application/json'])) {
+                        req.body = JSON.parse(data)
+                    } else {
+                        req.body = qs.parse(data)
+                    }
+                } catch (e) {
+                    next(e)
+                }
+                next()
+            })
+            req.on('error', e => next(e))
+        } else {
+            next()
+        }
     })
 
     app.listen = (...args) => {

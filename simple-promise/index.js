@@ -123,20 +123,6 @@ class Promise {
     }
 }
 
-const p = new Promise((resolve, reject) => {
-    console.log(`当前时间 ${Date.now()}: 代码走到了这里 开始`)
-    resolve(new Promise(resolve => (resolve('第一步'))))
-})
-
-p.then(data => {
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
-    return {name: 'quanquan'} // new Promise(resolve => resolve({name: 'quanquan'}))
-}, err => {
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 err: `, err)
-}).then(data => {
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
-})
-
 // 这个静态方法必须得用普通函数的书写方式
 Promise.defer = Promise.deferred = function () {
     const dfd = {}
@@ -146,6 +132,5 @@ Promise.defer = Promise.deferred = function () {
     })
     return dfd
 }
-
 
 module.exports = Promise

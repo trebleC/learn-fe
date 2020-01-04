@@ -123,8 +123,7 @@ class Promise {
     }
 }
 
-// 这个静态方法必须得用普通函数的书写方式
-Promise.defer = Promise.deferred = function () {
+Promise.defer = Promise.deferred = () => {
     const dfd = {}
     dfd.promise = new Promise((resolve, reject) => {
       dfd.resolve = resolve

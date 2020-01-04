@@ -167,4 +167,12 @@ Promise.race = ps => new Promise((resolve, reject) => ps.forEach(promise => {
 Promise.resolve = data => new Promise(resolve => resolve(data))
 Promise.reject = e => new Promise((resolve, reject) => reject(e))
 
+
+Promise.promisefy = fn => (...args) => new Promise((resolve, reject) => {
+    fn(...args, (err, data) => {
+        if (err) return viod(reject(err))
+        resolve(data)
+    })
+})
+
 module.exports = Promise

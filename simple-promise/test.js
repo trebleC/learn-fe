@@ -9,16 +9,11 @@ const Promise = require('./index')
 //     })
 // })
 
-const readFile = filePath => new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) reject(err)
-        resolve(data)
-    })
-})
+const readFile = Promise.promisefy(fs.readFile)
 
-readFile('1')
-    .then(data => readFile(data))
-    .then(data => readFile(data))
+readFile('1', 'utf8')
+    .then(data => readFile(data, 'utf8'))
+    .then(data => readFile(data, 'utf8'))
     .then(data => {
         console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
     })

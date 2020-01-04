@@ -132,4 +132,26 @@ Promise.defer = Promise.deferred = () => {
     return dfd
 }
 
+Promise.all = promises => new Promise((resolve, reject) => {
+    const ret = []
+    let index = 0
+
+    const run = (idx, data) => {
+        ret[idx] = data
+        if (++index === promises.length) {
+            resolve(ret)
+        }
+    }
+
+    promises.forEach((promise, idx) => {
+        if (promise instanceof Promise) {
+            promise.then(data => {
+                run(idx, data)
+            }, reject)
+        } else {
+            run(idx, promise)
+        }
+    })
+})
+
 module.exports = Promise

@@ -154,4 +154,14 @@ Promise.all = promises => new Promise((resolve, reject) => {
     })
 })
 
+Promise.race = ps => new Promise((resolve, reject) => ps.forEach(promise => {
+    if (promise instanceof Promise) {
+        promise.then(data => {
+            resolve(data)
+        }, reject)
+    } else {
+        resolve(promise)
+    }
+}))
+
 module.exports = Promise

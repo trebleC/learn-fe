@@ -1,7 +1,23 @@
 const fs = require('fs')
 const util = require('util')
-const co = require('co')
+// const co = require('co')
 const readFile =  util.promisify(fs.readFile)
+
+const co = it => new Promise((resolve, reject) => {
+    const next = data => {
+        const {value, done} = it.next(data)
+
+        if (!done) {
+            value.then(data => {
+                next(data)
+            }, reject)
+        } else {
+            resolve(data)
+        }
+    }
+    next()
+})
+
 
 function * readHello() {
     const content1 = yield readFile('1', 'utf8')

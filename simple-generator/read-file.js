@@ -8,9 +8,13 @@ const co = it => new Promise((resolve, reject) => {
         const {value, done} = it.next(data)
 
         if (!done) {
-            value.then(data => {
+            if (value instanceof Promise) {
+                value.then(data => {
+                    next(data)
+                }, reject)
+            } else {
                 next(data)
-            }, reject)
+            }
         } else {
             resolve(data)
         }
@@ -23,6 +27,7 @@ function * readHello() {
     const content1 = yield readFile('1', 'utf8')
     const content2 = yield readFile(content1, 'utf8')
     const content3 = yield readFile(content2, 'utf8')
+    const content4 = yield [1,2,3]
     return content3
 }
 

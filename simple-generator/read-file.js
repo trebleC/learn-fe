@@ -1,5 +1,6 @@
 const fs = require('fs')
 const util = require('util')
+const co = require('co')
 const readFile =  util.promisify(fs.readFile)
 
 function * readHello() {
@@ -11,14 +12,6 @@ function * readHello() {
 
 var it = readHello()
 
-const {value} = it.next()
-value.then(data => {
-    const {value} = it.next(data)
-    value.then(data => {
-        const {value} = it.next(data)
-        value.then(data => {
-            const {value} = it.next(data)
-            console.log(`当前时间 ${Date.now()}: debug 的数据是 value: `, value)
-        })
-    })
+co(it).then(data => {
+    console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
 })

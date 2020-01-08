@@ -36,3 +36,14 @@ var it = readHello()
 co(it).then(data => {
     console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
 })
+
+async function readHello2() {
+    const content1 = await readFile('1', 'utf8')
+    const content2 = await readFile(content1, 'utf8')
+    const content3 = await readFile(content2, 'utf8')
+    return content3
+}
+
+readHello2().then(data => {
+    console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
+})

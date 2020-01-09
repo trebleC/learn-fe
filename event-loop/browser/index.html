@@ -8,6 +8,7 @@
 </head>
 <body>
 
+    <div id="app"></div>
     <script>
         setTimeout(() => {
             console.log(`当前时间 ${Date.now()}: 代码走到了这里 timeout`)
@@ -18,6 +19,24 @@
 
         // 当前时间 1578570299987: 代码走到了这里 promise.then
         // 当前时间 1578570300030: 代码走到了这里 timeout
+
+        const observer = new MutationObserver(() => {
+            console.log(`当前时间 ${Date.now()}: 代码走到了这里 MutationObserver`)
+        })
+
+        const app = document.getElementById('app')
+
+        observer.observe(app, {
+            childList: true
+        })
+
+        for (let i = 0; i < 20; i++) {
+            app.append('1')
+        }
+
+        for (let i = 0; i < 20; i++) {
+            app.append('1')
+        }
     </script>
 </body>
 </html>

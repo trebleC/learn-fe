@@ -4,6 +4,16 @@ const conf = {
     PORT: 3000
 }
 
+const getRequestBody = bodyStr => {
+    const obj = {}
+    const reg = /([^=&]*)=([^=&]*)/g
+    bodyStr.replace(reg, (...args) => {
+        const [, k, v] = args
+        obj[k] = v
+    })
+    return obj
+}
+
 const app = http.createServer((request, response) => {
     const { method }  = request
     if (method === 'POST') {
@@ -14,8 +24,8 @@ const app = http.createServer((request, response) => {
 
         request.on('end', () => {
             const data = Buffer.concat(dataArr).toString()
-
-            response.end(data)
+            const obj = getRequestBody(data)
+            response.end(JSON.stringify(obj))
         })
 
     } else {

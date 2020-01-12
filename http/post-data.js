@@ -27,6 +27,7 @@ const app = http.createServer((request, response) => {
         request.on('end', () => {
             const data = Buffer.concat(dataArr).toString()
             const obj = querystring.parse(data)
+            response.setHeader('content-type', 'application/json')
             response.end(JSON.stringify(obj))
         })
 

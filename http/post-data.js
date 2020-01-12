@@ -1,4 +1,5 @@
 const http = require('http')
+// 这里也可以引用第三方模块 qs
 const querystring = require('querystring')
 
 const conf = {

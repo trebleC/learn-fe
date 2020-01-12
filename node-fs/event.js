@@ -21,6 +21,18 @@ class EventEmitter {
 
         }
     }
+
+    off(et, cb) {
+        if (Array.isArray(this._events[et])) {
+            if (typeof cb === 'function') {
+                this._events[et] = this._events[et].filter(fn => fn !== cb)
+            } else {
+                delete this._events[et]
+            }
+        } else {
+            console.warn('解除绑定失败');
+        }
+    }
 }
 
 
@@ -34,4 +46,13 @@ e.on('eat', () => {
     console.log('馒头')
 })
 
+const eatFood = () => {
+    console.log('eatFood')
+}
+
+e.on('eat', eatFood)
+e.emit('eat')
+e.off('eat', eatFood)
+e.emit('eat')
+e.off('eat')
 e.emit('eat')

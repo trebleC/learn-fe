@@ -1,4 +1,5 @@
 const http = require('http')
+const querystring = require('querystring')
 
 const conf = {
     PORT: 3000
@@ -24,7 +25,7 @@ const app = http.createServer((request, response) => {
 
         request.on('end', () => {
             const data = Buffer.concat(dataArr).toString()
-            const obj = getRequestBody(data)
+            const obj = querystring.parse(data)
             response.end(JSON.stringify(obj))
         })
 

@@ -20,6 +20,11 @@ const chunks = []
 rs.on('data', chunk => {
     chunks.push(chunk)
     console.log(chunk)
+    rs.pause() // 暂停读取
+
+    setTimeout(() => {
+        rs.resume()
+    }, 1e3);
 })
 
 // 文件读取完成时触发 end 事件

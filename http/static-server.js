@@ -10,6 +10,19 @@ const conf = {
     PORT: 3333
 }
 
+const readFile = (filePath, response) => {
+    fs.readFile(filePath, (err, fd) => {
+        if (err) {
+            response.statusCode = 404
+            response.end('Not found ~')
+            return
+        }
+
+        response.setHeader('Content-Type', mime.getType(filePath))
+        response.end(fd)
+    })
+}
+
 const server = http.createServer((request, response) => {
     const {url: reqUrl} = request
     const {pathname} = url.parse(reqUrl, true)
@@ -23,14 +36,7 @@ const server = http.createServer((request, response) => {
         }
 
         if (stats.isFile()) {
-            fs.readFile(absPath, (err, fd) => {
-                if (err) {
-                    response.statusCode = 404
-                    response.end('Not found ~')
-                }
-                response.setHeader('Content-Type', mime.getType(absPath))
-                response.end(fd)
-            })
+            readFile(absPath, response)
         } else if (stats.isDirectory()) {
             const realPath = join(absPath, 'index.html')
             fs.access(realPath, 'r', (err, fd) => {
@@ -38,19 +44,9 @@ const server = http.createServer((request, response) => {
                     response.statusCode = 404
                     response.end('Not found ~')
                 } else {
-                    fs.readFile(realPath, (err, fd) => {
-                        if (err) {
-                            response.statusCode = 404
-                            response.end('Not found ~')
-                        }
-                        response.setHeader('Content-Type', mime.getType(realPath))
-                        response.end(fd)
-                    })
+                    readFile(realPath, response)
                 }
             })
-        } else {
-            response.statusCode = 404
-            response.end('Not found ~')
         }
     })
 })

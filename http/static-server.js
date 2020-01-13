@@ -1,6 +1,6 @@
 const http = require('http')
 const url = require('url')
-const fs = require('fs')
+const fs = require('mz/fs')
 const mime = require('mime')
 const {join} = require('path')
 
@@ -10,45 +10,47 @@ const conf = {
     PORT: 3333
 }
 
-const readFile = (filePath, response) => {
-    fs.readFile(filePath, (err, fd) => {
-        if (err) {
-            response.statusCode = 404
-            response.end('Not found ~')
-            return
-        }
-
-        response.setHeader('Content-Type', mime.getType(filePath))
-        response.end(fd)
-    })
-}
+const toString = buffer => buffer.toString()
 
 const server = http.createServer((request, response) => {
     const {url: reqUrl} = request
     const {pathname} = url.parse(reqUrl, true)
     const absPath = join(basePath, pathname)
 
-    fs.stat(absPath, (err, stats) => {
-        if (err) {
-            response.statusCode = 404
-            response.end('Not found ~')
-            return
+    // 处理路径, 如果前前端请求的是一个目录而不是文件的话默认查找目录里边的 index.html
+    const handlePath = stats => {
+        let filePath = absPath
+        if (stats.isDirectory()) {
+            filePath = join(absPath, 'index.html')
         }
+        return filePath
+    }
 
-        if (stats.isFile()) {
-            readFile(absPath, response)
-        } else if (stats.isDirectory()) {
-            const realPath = join(absPath, 'index.html')
-            fs.access(realPath, 'r', (err, fd) => {
-                if (err) {
-                    response.statusCode = 404
-                    response.end('Not found ~')
-                } else {
-                    readFile(realPath, response)
-                }
-            })
-        }
-    })
+    // 根据文件的后缀名称确定返回的响应头响应文档类型
+    const setHeader = filePath => {
+        response.setHeader('Content-Type', mime.getType(filePath))
+        return filePath
+    }
+
+    // 发送数据
+    const sendData = fd => {
+        response.end(fd)
+    }
+
+    // 错误捕获
+    const catchError = err => {
+        console.log(err)
+        response.statusCode = 404
+        response.end('Not found ~')
+    }
+
+    fs.stat(absPath)
+        .then(handlePath)
+        .then(setHeader)
+        .then(fs.readFile)
+        .then(toString)
+        .then(sendData)
+        .catch(catchError)
 })
 
 server.listen(conf.PORT, () => {

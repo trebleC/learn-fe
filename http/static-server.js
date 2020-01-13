@@ -10,8 +10,6 @@ const conf = {
     PORT: 3333
 }
 
-const toString = buffer => buffer.toString()
-
 const server = http.createServer((request, response) => {
     const {url: reqUrl} = request
     const {pathname} = url.parse(reqUrl, true)
@@ -32,10 +30,8 @@ const server = http.createServer((request, response) => {
         return filePath
     }
 
-    // 发送数据
-    const sendData = fd => {
-        response.end(fd)
-    }
+    // 使用流读取文件, 并直接写到响应里边
+    const readAndSend = filePath => fs.createReadStream(filePath).pipe(response)
 
     // 错误捕获
     const catchError = err => {
@@ -47,9 +43,7 @@ const server = http.createServer((request, response) => {
     fs.stat(absPath)
         .then(handlePath)
         .then(setHeader)
-        .then(fs.readFile)
-        .then(toString)
-        .then(sendData)
+        .then(readAndSend)
         .catch(catchError)
 })
 

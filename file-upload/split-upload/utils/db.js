@@ -7,11 +7,18 @@ db.defaults({
     files: []
 }).write()
 
-exports.getFile = md5 => {
+const getFile = md5 => {
+    return db.get('files')
+        .find({md5})
+        .value()
+}
+
+const setFile = file => {
 
 }
 
-exports.setFile = file => {
-
+module.exports = {
+    getFile, 
+    setFile
 }
 

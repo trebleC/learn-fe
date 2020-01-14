@@ -15,7 +15,7 @@
 
 > 请求说明: <br>
 > 请求方式: GET<br>
-> 请求PATH: `/upload/fileCheck`
+> 请求PATH: `/upload/fileCheck/{md5}`
 
 ### 1.3 请求参数
 

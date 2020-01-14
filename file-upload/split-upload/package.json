@@ -18,5 +18,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "nodemonConfig": {
+    "ignore": ["db.json"],
+    "delay": "500"
+  }
 }

@@ -5,6 +5,8 @@ const KoaRouter = require('koa-router')
 const koaStatic = require('koa-static')
 const koaBody = require('koa-body')
 
+const {getReqData, db} = require('./utils')
+
 const conf = {
     PORT: 3333,
     storePath: path.resolve(__dirname, 'store'),
@@ -23,10 +25,28 @@ if (!fs.existsSync(conf.tempPath)) {
 const app = new Koa()
 const router = new KoaRouter()
 
-router.post('/file-check', async ctx => {
+router.prefix('/upload')
+
+router.post('/fileCheck/:md5', async ctx => {
+    const [{md5}] = getReqData(ctx)
+    const file = db.getFile(md5)
+    if (file) {
+        ctx.body = file
+    } else {
+        ctx.statusCode = 404
+    }  
 })
 
-router.post('/upload', async ctx => {
+router.post('/chunkCheck/:fileMd5/:md5', async ctx => {
+
+})
+
+router.post('/', async ctx => {
+
+})
+
+router.post('/fileMerge', async ctx => {
+    
 })
 
 app.use(koaStatic(__dirname))

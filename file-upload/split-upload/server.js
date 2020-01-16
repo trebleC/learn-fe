@@ -27,14 +27,17 @@ const router = new KoaRouter()
 
 router.prefix('/upload')
 
-router.post('/fileCheck/:md5', async ctx => {
+router.get('/fileCheck/:md5', async ctx => {
     const [{md5}] = getReqData(ctx)
     const file = db.getFile(md5)
+    const ret = {errno: 0}
     if (file) {
-        ctx.body = file
+        ret.data = file
     } else {
-        ctx.statusCode = 404
-    }  
+        ret.errno = 1
+    }
+
+    ctx.body = ret
 })
 
 router.post('/chunkCheck/:fileMd5/:md5', async ctx => {
@@ -46,7 +49,7 @@ router.post('/', async ctx => {
 })
 
 router.post('/fileMerge', async ctx => {
-    
+
 })
 
 app.use(koaStatic(__dirname))

@@ -11,37 +11,54 @@
 <body>
     <input type="file" id="file" name="file">
 
+    <script src="//cdn.bootcss.com/axios/0.19.0-beta.1/axios.js"></script>
+    <script src="https://cdn.bootcss.com/spark-md5/3.0.0/spark-md5.js"></script>
+    <script src="./js/md5File.js"></script>
     <script>
         const oFile = document.getElementById('file')
+
+        class Chunk {
+            constructor() {
+
+            }
+        }
+
+        class Main {
+            constructor(file) {
+                this.ajax = axios
+                this.file = file
+                this.init()
+            }
+
+            async init() {
+                const md5 = await md5File(this.file)
+                console.log(`当前时间 ${Date.now()}: debug 的数据是 md5: `, md5)
+                await this.fileCheck(md5)
+            }
+
+            fileCheck() {
+                return new Promise((resolve, reject) => {
+                })
+            }
+
+            chunkCheck() {
+
+            }
+
+            upload() {
+
+            }
+
+            fileMerge() {
+
+            }
+        }
 
         oFile.onchange = e => {
             const { target: { files } } = e
             const file = files[0]
             if (file) {
-                const fd = new FormData()
-                fd.append('file', file)
-                const xhr = new XMLHttpRequest()
-                xhr.open('POST', '/upload')
-                xhr.responseType = 'json'
-                xhr.onreadystatechange = () => {
-                    if (
-                        xhr.readyState === 4
-                        && (
-                            (xhr.status >= 200 && xhr.status < 300)
-                            || xhr.status === 304
-                        )
-                    ) {
-                        console.log(xhr.response)
-                    }
-                }
-
-                xhr.upload.onprogress = ({ loaded, total, lengthComputable }) => {
-                    console.log(`当前上传了 ${(loaded / total * 100).toFixed(2)} %`)
-                    if (lengthComputable) {
-                        console.log(`当前上传了 ${(loaded / total * 100).toFixed(2)} %`)
-                    }
-                }
-                xhr.send(fd)
+                new Main(file).init()
             }
         }
     </script>

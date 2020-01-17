@@ -9,10 +9,10 @@
       params,
       query,
       request: {
-        body
+        body,
+        files
       }
     } = ctx
-  
-    return [ params, query, body ]
+
+    return [ params, query, body, files ]
   }
-  

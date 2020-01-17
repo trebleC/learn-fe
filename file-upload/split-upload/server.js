@@ -10,7 +10,8 @@ const {getReqData, db} = require('./utils')
 const conf = {
     PORT: 3333,
     storePath: path.resolve(__dirname, 'store'),
-    tempPath: path.resolve(__dirname, 'temp')
+    tempPath: path.resolve(__dirname, 'temp'),
+    chunkTemp: path.resolve(__dirname, 'chunk-temp')
 }
 
 // 保证必要目录存在
@@ -20,6 +21,10 @@ if (!fs.existsSync(conf.storePath)) {
 
 if (!fs.existsSync(conf.tempPath)) {
     fs.mkdirSync(conf.tempPath)
+}
+
+if (!fs.existsSync(conf.chunkTemp)) {
+    fs.mkdirSync(conf.chunkTemp)
 }
 
 const app = new Koa()
@@ -40,16 +45,39 @@ router.get('/fileCheck/:md5', async ctx => {
     ctx.body = ret
 })
 
-router.post('/chunkCheck/:fileMd5/:md5', async ctx => {
+router.get('/chunkCheck/:fileMd5/:chunkId', async ctx => {
+    const [{fileMd5, chunkId}] = getReqData(ctx)
+    const ret = {errno: 1, msg: 'already'}
+    if (fs.existsSync(`${conf.chunkTemp}/${fileMd5}/${chunkId}`)) {
+        ret.errno = 0
+        ret.msg = 'not have'
+    }
 
+    ctx.body = ret
 })
 
-router.post('/', async ctx => {
-
+router.post('/:fileMd5/:chunkId', async ctx => {
+    const [{fileMd5, chunkId},,, files] = getReqData(ctx)
+    if (!fs.existsSync(`${conf.chunkTemp}/${fileMd5}`)) {
+        fs.mkdirSync(`${conf.chunkTemp}/${fileMd5}`)
+    }
+    const {file: {path}} = files
+    const newChunkPath = `${conf.chunkTemp}/${fileMd5}/${chunkId}`
+    await fs.rename(path, newChunkPath)
+    ctx.body = { errno: 0 }
 })
 
-router.post('/fileMerge', async ctx => {
+router.post('/fileMerge/:md5/:chunks/:fileName/:size', async ctx => {
+    let [{md5, chunks, fileName, size}] = getReqData(ctx)
 
+    for (i = 0; i < +chunks; i++) {
+        fs.appendFileSync(`${conf.storePath}/${fileName}`, fs.readFileSync(`${conf.chunkTemp}/${md5}/${i}`));
+        fs.unlinkSync(`${conf.chunkTemp}/${md5}/${i}`);
+    }
+
+    fs.rmdirSync(`${conf.chunkTemp}/${md5}`)
+    db.setFile({md5, chunks, fileName, size})
+    ctx.body = {data: {md5, chunks, fileName, size}}
 })
 
 app.use(koaStatic(__dirname))

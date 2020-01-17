@@ -14,11 +14,13 @@ const getFile = md5 => {
 }
 
 const setFile = file => {
-
+    db.get('files')
+    .push(file)
+    .write()
 }
 
 module.exports = {
-    getFile, 
+    getFile,
     setFile
 }
 

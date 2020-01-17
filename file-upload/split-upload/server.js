@@ -80,7 +80,7 @@ router.post('/fileMerge/:md5/:chunks/:fileName/:size', async ctx => {
 
     fs.rmdirSync(`${conf.chunkTemp}/${md5}`)
     db.setFile({md5, fileName, size})
-    ctx.body = {data: {md5, fileName, size}}
+    ctx.body = {errno: 0, data: {md5, fileName, size}}
 })
 
 app.use(koaStatic(__dirname))

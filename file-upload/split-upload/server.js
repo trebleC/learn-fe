@@ -70,7 +70,10 @@ router.post('/:fileMd5/:chunkId', async ctx => {
 router.post('/fileMerge/:md5/:chunks/:fileName/:size', async ctx => {
     let [{md5, chunks, fileName, size}] = getReqData(ctx)
 
-    for (i = 0; i < +chunks; i++) {
+    size = +size
+    chunks = +chunks
+
+    for (i = 0; i < chunks; i++) {
         fs.appendFileSync(`${conf.storePath}/${fileName}`, fs.readFileSync(`${conf.chunkTemp}/${md5}/${i}`));
         fs.unlinkSync(`${conf.chunkTemp}/${md5}/${i}`);
     }

@@ -47,10 +47,10 @@ router.get('/fileCheck/:md5', async ctx => {
 
 router.get('/chunkCheck/:fileMd5/:chunkId', async ctx => {
     const [{fileMd5, chunkId}] = getReqData(ctx)
-    const ret = {errno: 1, msg: 'already'}
+    const ret = {errno: 1, msg: 'not have'}
     if (fs.existsSync(`${conf.chunkTemp}/${fileMd5}/${chunkId}`)) {
         ret.errno = 0
-        ret.msg = 'not have'
+        ret.msg = 'already'
     }
 
     ctx.body = ret

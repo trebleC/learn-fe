@@ -20,7 +20,9 @@
   "author": "",
   "license": "ISC",
   "nodemonConfig": {
-    "ignore": ["db.json"],
+    "ignore": [
+      "db.json"
+    ],
     "delay": "500"
   }
 }

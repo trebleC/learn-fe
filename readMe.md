@@ -23,3 +23,5 @@
 - [使用流读写文件-速率控制](https://github.com/luoquanquan/learn-fe/blob/master/node-fs/read%2Bwrite-stream.js)
 - [http 模块基础使用](https://github.com/luoquanquan/learn-fe/tree/master/http)
 - [原生 node 实现静态文件服务](https://github.com/luoquanquan/learn-fe/blob/master/http/static-server.js)
+- [各种方式实现的文件上传](https://github.com/luoquanquan/learn-fe/tree/master/file-upload)
+- [大文件分块上传 & 秒传 & 断点续传](https://github.com/luoquanquan/learn-fe/tree/master/file-upload/split-upload)

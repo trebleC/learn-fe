@@ -27,6 +27,7 @@
 
         const xhr2 = new XMLHttpRequest()
         xhr2.open('put', 'http://localhost:3333/user')
+        xhr2.setRequestHeader('token', 'quanquan')
         xhr2.onreadystatechange = () => {
             if (xhr2.readyState === 4) {
                 if ((xhr2.status >= 200 && xhr2.status < 300) || xhr2.status === 304) {

@@ -20,6 +20,10 @@ class Server {
 
         response.setHeader('Access-Control-Allow-Origin', '*')
 
+        if (method === 'options') {
+            return void(response.end())
+        }
+
         switch (pathname) {
             case '/user':
                     if (method === 'get') {

@@ -18,6 +18,8 @@ class Server {
         let { method } = request
         method = method.toLowerCase()
 
+        response.setHeader('Access-Control-Allow-Origin', '*')
+
         switch (pathname) {
             case '/user':
                     if (method === 'get') {

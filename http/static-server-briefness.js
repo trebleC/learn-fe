@@ -15,17 +15,21 @@ class Server {
         const { pathname } = url.parse(request.url, true)
         let absPath = join(basePath, pathname)
 
-        const statusObj = await fs.stat(absPath)
+        try {
+            const statusObj = await fs.stat(absPath)
 
-        if (statusObj.isDirectory()) {
-            absPath = join(absPath, 'index.html')
-        }
+            if (statusObj.isDirectory()) {
+                absPath = join(absPath, 'index.html')
+            }
 
-        const fileExist = await fs.exists(absPath)
+            const fileExist = await fs.exists(absPath)
 
-        if (fileExist) {
-            this.renderFile(absPath, response)
-        } else {
+            if (fileExist) {
+                this.renderFile(absPath, response)
+            } else {
+                this.renderError(response)
+            }
+        } catch (error) {
             this.renderError(response)
         }
     }

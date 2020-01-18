@@ -21,6 +21,8 @@ class Server {
         response.setHeader('Access-Control-Allow-Origin', '*')
         response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
         response.setHeader('Access-Control-Allow-Headers', 'token')
+        // 预检请求的有效时间, 单位是秒. 默认值为 5
+        response.setHeader('Access-Control-Max-Age', 10)
 
         if (method === 'options') {
             return void(response.end())

@@ -22,13 +22,9 @@ class Server {
                 absPath = join(absPath, 'index.html')
             }
 
-            const fileExist = await fs.exists(absPath)
+            await fs.access(absPath)
 
-            if (fileExist) {
-                this.renderFile(absPath, response)
-            } else {
-                this.renderError(response)
-            }
+            this.renderFile(absPath, response)
         } catch (error) {
             this.renderError(response)
         }

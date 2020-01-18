@@ -18,11 +18,12 @@ class Server {
         let { method } = request
         method = method.toLowerCase()
 
-        response.setHeader('Access-Control-Allow-Origin', '*')
+        response.setHeader('Access-Control-Allow-Origin', 'http://localhost:5500')
         response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
         response.setHeader('Access-Control-Allow-Headers', 'token')
         // 预检请求的有效时间, 单位是秒. 默认值为 5
         response.setHeader('Access-Control-Max-Age', 10)
+        response.setHeader('Access-Control-Allow-Credentials', true)
 
         if (method === 'options') {
             return void(response.end())

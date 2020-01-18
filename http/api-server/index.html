@@ -15,7 +15,7 @@
         }
 
         const xhr = new XMLHttpRequest()
-        xhr.open('get', '/user')
+        xhr.open('get', 'http://localhost:3333/user')
         xhr.onreadystatechange = () => {
             if (xhr.readyState === 4) {
                 if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
@@ -26,7 +26,7 @@
         xhr.send()
 
         const xhr2 = new XMLHttpRequest()
-        xhr2.open('put', '/user')
+        xhr2.open('put', 'http://localhost:3333/user')
         xhr2.onreadystatechange = () => {
             if (xhr2.readyState === 4) {
                 if ((xhr2.status >= 200 && xhr2.status < 300) || xhr2.status === 304) {

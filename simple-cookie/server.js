@@ -7,13 +7,13 @@ http.createServer((request, response) => {
     const {pathname} = url.parse(request.url)
 
     switch (pathname) {
-        case '/get':
+        case '/get': case '/get/2': case '/get2':
             const {cookie} = request.headers
             const cookieObj = querystring.parse(cookie, '; ')
             response.end(JSON.stringify(cookieObj))
             break
         case '/set':
-            response.setHeader('Set-Cookie', ['name=quanquan; domain=quanquan.com', 'age=18'])
+            response.setHeader('Set-Cookie', ['name=quanquan; domain=quanquan.com; path=/get', 'age=18'])
             response.end('success ~')
             break
         default:

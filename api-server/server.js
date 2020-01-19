@@ -15,31 +15,34 @@ class Server {
         const { pathname } = url.parse(request.url, true)
         let absPath = join(basePath, pathname)
 
-        let { method } = request
+        let { method, headers: { origin } } = request
         method = method.toLowerCase()
 
-        response.setHeader('Access-Control-Allow-Origin', 'http://localhost:5500')
-        response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
-        response.setHeader('Access-Control-Allow-Headers', 'token')
-        // 预检请求的有效时间, 单位是秒. 默认值为 5
-        response.setHeader('Access-Control-Max-Age', 10)
-        response.setHeader('Access-Control-Allow-Credentials', true)
+        // 发送页面 *.html 请求的时候不会携带 origin 请求头, 不用设置跨域
+        if (origin) {
+            response.setHeader('Access-Control-Allow-Origin', origin)
+            response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+            response.setHeader('Access-Control-Allow-Headers', 'token')
+            // 预检请求的有效时间, 单位是秒. 默认值为 5
+            response.setHeader('Access-Control-Max-Age', 10)
+            response.setHeader('Access-Control-Allow-Credentials', true)
+        }
 
         if (method === 'options') {
-            return void(response.end())
+            return void (response.end())
         }
 
         switch (pathname) {
             case '/user':
-                    if (method === 'get') {
-                        response.setHeader('Content-Type', 'application/json')
-                        response.end(JSON.stringify({name: 'quanquan', method: 'get'}))
-                    }
+                if (method === 'get') {
+                    response.setHeader('Content-Type', 'application/json')
+                    response.end(JSON.stringify({ name: 'quanquan', method: 'get' }))
+                }
 
-                    if (method === 'put') {
-                        response.setHeader('Content-Type', 'application/json')
-                        response.end(JSON.stringify({name: 'quanquan', method: 'put'}))
-                    }
+                if (method === 'put') {
+                    response.setHeader('Content-Type', 'application/json')
+                    response.end(JSON.stringify({ name: 'quanquan', method: 'put' }))
+                }
                 break;
             default:
                 break;

@@ -6,17 +6,39 @@ const PORT = 3333
 http.createServer((request, response) => {
     const {pathname} = url.parse(request.url)
 
+    const cookieArr = []
+    response.setCookie = (k, v, opt) => {
+        cookieArr.push(`${k}=${v}`)
+        for (let key in opt) {
+            cookieArr[cookieArr.length - 1] += `; ${key}=${opt[key]}`
+        }
+
+        // 利用多次设置 Set-Cookie 响应头以最后一次为准, 设置所有 cookie
+        response.setHeader('Set-Cookie', cookieArr)
+    }
+
+    request.getCookie = key => {
+        const {cookie} = request.headers
+        const {[key]: value = ''} = querystring.parse(cookie, '; ')
+        return value
+    }
+
     switch (pathname) {
         case '/get': case '/get/2': case '/get2':
-            const {cookie} = request.headers
-            const cookieObj = querystring.parse(cookie, '; ')
-            response.end(JSON.stringify(cookieObj))
+            response.end(request.getCookie('name'))
             break
         case '/set':
-            response.setHeader('Set-Cookie', [
-                'name=quanquan; domain=quanquan.com; path=/get',
-                'age=18; max-age=10; httpOnly=true;'
-            ])
+
+            response.setCookie('name', 'quanquan', {
+                domain: 'quanquan.com',
+                path: '/'
+            })
+
+            response.setCookie('age', '18', {
+                ['max-age']: '10',
+                httpOnly: true
+            })
+
             response.end('success ~')
             break
         default:

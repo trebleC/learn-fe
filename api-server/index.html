@@ -10,13 +10,13 @@
 
 
     <script>
-        document.cookie = 'name=quanquan'
         const handleData = data => {
             console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
         }
 
         const xhr = new XMLHttpRequest()
-        xhr.open('get', 'http://localhost:3333/user')
+        xhr.withCredentials = true
+        xhr.open('get', 'http://b.quanquan.com:3333/user')
         xhr.onreadystatechange = () => {
             if (xhr.readyState === 4) {
                 if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
@@ -27,7 +27,7 @@
         xhr.send()
 
         const xhr2 = new XMLHttpRequest()
-        xhr2.open('put', 'http://localhost:3333/user')
+        xhr2.open('put', 'http://b.quanquan.com:3333/user')
         xhr2.setRequestHeader('token', 'quanquan')
         xhr2.withCredentials = true
         xhr2.onreadystatechange = () => {

@@ -13,7 +13,7 @@ http.createServer((request, response) => {
             response.end(JSON.stringify(cookieObj))
             break
         case '/set':
-            response.setHeader('Set-Cookie', ['name=quanquan', 'age=18'])
+            response.setHeader('Set-Cookie', ['name=quanquan; domain=quanquan.com', 'age=18'])
             response.end('success ~')
             break
         default:

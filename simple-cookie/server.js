@@ -14,6 +14,7 @@ http.createServer((request, response) => {
             break
         case '/set':
             response.setHeader('Set-Cookie', 'name=quanquan')
+            response.setHeader('Set-Cookie', 'age=18')
             response.end('success ~')
             break
         default:

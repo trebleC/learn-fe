@@ -15,7 +15,7 @@ http.createServer((request, response) => {
         case '/set':
             response.setHeader('Set-Cookie', [
                 'name=quanquan; domain=quanquan.com; path=/get',
-                'age=18; max-age=10'
+                'age=18; max-age=10; httpOnly=true;'
             ])
             response.end('success ~')
             break

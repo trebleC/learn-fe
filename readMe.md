@@ -27,3 +27,4 @@
 - [大文件分块上传 & 秒传 & 断点续传](https://github.com/luoquanquan/learn-fe/tree/master/file-upload/split-upload)
 - [apiServer & CORS 跨域 & 携带 Cookie](https://github.com/luoquanquan/learn-fe/blob/master/api-server)
 - [Server Cookie 操作](https://github.com/luoquanquan/learn-fe/blob/master/simple-cookie/server.js)
+- [手写 bind & call & apply](https://github.com/luoquanquan/learn-fe/tree/master/customize-this)

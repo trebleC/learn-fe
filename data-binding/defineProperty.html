@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>使用 Object.defineProperty 实现双向数据绑定</title>
+</head>
+<body>
+
+    <div class="wrap">
+        <p>当前的值为: <b id="count"></b></p>
+
+        <input type="text" onkeyup="updateCount(event)">
+
+        <button>创建一个随机的值</button>
+    </div>
+
+    <script>
+        var obj= {
+            count: ''
+        }
+
+        function updateCount(e) {
+            obj.count = e.target.value
+        }
+
+        Object.defineProperty(obj, 'count', {
+            get() {
+                console.log(`当前时间 ${Date.now()}: 代码走到了这里 获取 count`)
+                return count
+            },
+            set(value) {
+                console.log(`当前时间 ${Date.now()}: 代码走到了这里 设置 count`, value)
+
+                document.querySelector('#count').innerHTML = value
+                document.querySelector('input').value = value
+            }
+        })
+
+        document.querySelector('button').onclick = function() {
+            var random = Math.random()
+
+            obj.count = random
+        }
+    </script>
+</body>
+</html>

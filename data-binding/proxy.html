@@ -9,6 +9,14 @@
 </head>
 
 <body>
+
+    <div class="box">
+        <p>当前值为: <b id="count"></b></p>
+        <input type="text" onkeyup="updateCount(event)">
+
+        <button>创建一个随机数</button>
+    </div>
+
     <script>
         const data = {
             count: 100
@@ -22,11 +30,25 @@
                 } else {
                     return '我没有这个属性呀~'
                 }
+            },
+            set(target, key, value, receiver) {
+                console.log(`当前时间 ${Date.now()}: debug 的数据是 target, key, value, receiver: `, target, key, value, receiver)
+                if (key === 'count') {
+                    document.querySelector('#count').innerHTML = value
+                    document.querySelector('input').value = value
+                }
             }
         })
 
-        console.log(`当前时间 ${Date.now()}: debug 的数据是 obj.count: `, obj.count)
-        console.log(`当前时间 ${Date.now()}: debug 的数据是 obj.count: `, obj.baba)
+        function updateCount(e) {
+            obj.count = e.target.value
+        }
+
+        document.querySelector('button').onclick = function() {
+            var random = Math.random()
+
+            obj.count = random
+        }
 
     </script>
 </body>

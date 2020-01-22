@@ -4,6 +4,10 @@
 
 #### 2020-01
 
+- [手写 ejs 模板引擎](https://github.com/luoquanquan/learn-fe/blob/master/simple-ejs/)
+- [Cookie(签名) & 加密(md5 sha256) & session](https://github.com/luoquanquan/learn-fe/blob/master/simple-cookie/)
+- [手写实现 instanceof](https://github.com/luoquanquan/learn-fe/blob/master/simple-instanceof/index.js)
+- [hash & history 前端路由](https://github.com/luoquanquan/learn-fe/tree/master/fe-router)
 - [双向数据绑定](https://github.com/luoquanquan/learn-fe/tree/master/data-binding)
 - [手写 bind & call & apply](https://github.com/luoquanquan/learn-fe/tree/master/customize-this)
 - [Server Cookie 操作](https://github.com/luoquanquan/learn-fe/blob/master/simple-cookie/server.js)

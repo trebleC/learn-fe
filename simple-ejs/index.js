@@ -4,7 +4,12 @@ const path = require('path')
 
 const obj = {
     name: 'quanquan',
-    sex: 'male'
+    sex: 'male',
+    arr: [
+        '是时候扼杀那些陷入黑暗的人了',
+        '我用双手成就你的梦想',
+        '我的剑就是你的⚔'
+    ]
 }
 
 const render = (ejsStr, obj) => {
@@ -14,6 +19,6 @@ const render = (ejsStr, obj) => {
 }
 
 const ejsStr = fs.readFileSync(path.resolve(__dirname, 'index.ejs'), 'utf-8')
-const htmlStr = render(ejsStr, obj)
+const htmlStr = ejs.render(ejsStr, obj)
 
 console.log(htmlStr)

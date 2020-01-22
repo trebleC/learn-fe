@@ -13,12 +13,26 @@ const obj = {
 }
 
 const render = (ejsStr, obj) => {
-    return ejsStr.replace(/<%=(.*?)%>/g, (...args) => {
-        return obj[args[1]]
+    ejsStr = ejsStr.replace(/<%=(.*?)%>/g, (...args) => {
+        // 因为外层用了 with(){} 所以这里可以直接拿到对应的值
+        return '${' + args[1] + '}'
     })
+
+    let head = `let str;
+        with(obj) {
+    `
+    head += 'str = `\r\n'
+    const content = ejsStr.replace(/<%(.*?)%>/g, (...args) => {
+        return '`\r\n' + args[1] + '\r\n str +=`'
+    })
+    const tail = '`}; return str;'
+
+    const fn = new Function('obj', `${head}${content}${tail}`)
+
+    return fn(obj)
 }
 
 const ejsStr = fs.readFileSync(path.resolve(__dirname, 'index.ejs'), 'utf-8')
-const htmlStr = ejs.render(ejsStr, obj)
+const htmlStr = render(ejsStr, obj)
 
 console.log(htmlStr)

@@ -6,7 +6,14 @@ const obj = {
     name: 'quanquan',
     sex: 'male'
 }
+
+const render = (ejsStr, obj) => {
+    return ejsStr.replace(/<%=(.*)%>/g, (...args) => {
+        return obj[args[1]]
+    })
+}
+
 const ejsStr = fs.readFileSync(path.resolve(__dirname, 'index.ejs'), 'utf-8')
-const htmlStr = ejs.render(ejsStr, obj)
+const htmlStr = render(ejsStr, obj)
 
 console.log(htmlStr)

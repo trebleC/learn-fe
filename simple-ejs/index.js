@@ -8,7 +8,7 @@ const obj = {
 }
 
 const render = (ejsStr, obj) => {
-    return ejsStr.replace(/<%=(.*)%>/g, (...args) => {
+    return ejsStr.replace(/<%=(.*?)%>/g, (...args) => {
         return obj[args[1]]
     })
 }

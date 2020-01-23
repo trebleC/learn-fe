@@ -78,6 +78,9 @@ http.createServer((request, response) => {
                 return void (renderFile(filePath, response))
             }
 
+            response.setHeader('Expires', new Date(Date.now() + 1e4).toGMTString())
+            response.setHeader('Cache-Control', 'max-age=10')
+
             const { hited: hitEtag, file, etag } = await checkEtag(filePath, lastEtag)
             if (hitEtag) {
                 return void (render304(response))

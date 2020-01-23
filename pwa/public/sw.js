@@ -1,3 +1,13 @@
+const CACHE_NAME = 'cache-v1'
+const CACHE_LIST = [
+    '/',
+    '/css/index.css',
+    '/js/app.js',
+    '/api/getImage'
+]
+
+const handleCache = () => caches.open(CACHE_NAME).then(cache => cache.addAll(CACHE_LIST))
+
 self.addEventListener('fetch', e => {
     console.log(e.request.url)
 })
@@ -6,6 +16,7 @@ self.addEventListener('fetch', e => {
 self.addEventListener('install', e => {
     // 如果前一个 sw 不销毁需要手动 skipWaiting
     console.log(`当前时间 ${Date.now()}: 代码走到了这里 install`)
+    e.waitUntil(handleCache())
 })
 
 // 当前的 sw 激活的时候触发

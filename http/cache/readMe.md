@@ -15,3 +15,5 @@ PS: 如果文件设置了 Last-Modified, 下次访问时会命中浏览器默认
 1. 没有关闭浏览器在当前页面刷新重新获取该图片的话返回 statusCode 为 200, Size tab 展示内容来自 memory cache
 2. 没有关闭浏览器在当前页面刷新重新获取该图片的话返回 statusCode 为 200, Size tab 展示内容来自 disk cache
 3. 关闭浏览器再打开当前 url index.html 甚至都会命中强缓存 statusCode 为 200, Size tab 展示内容来自 disk cache
+
+项目中加入一张 svg 格式的内容以后, 打开 svg 文件没有修改其内部的内容直接保存的话刷新浏览器, 并不能命中缓存, 这是因为保存的时候文件的 modify-time 发生了改变导致的, 因此引入了根据文件内容创建 hash 值的 Etag 方式实现的缓存判断逻辑~

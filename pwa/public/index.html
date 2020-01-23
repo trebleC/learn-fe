@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./css/index.css">
+    <title>PWA</title>
+</head>
+<body>
+    <h3>就这么多图了叭~</h3>
+
+    <div class="box"></div>
+
+    <script>
+        class Page {
+            constructor() {
+                this.box = document.querySelector('.box')
+                this.imgList = []
+            }
+
+            init() {
+                const xhr = new XMLHttpRequest()
+                xhr.open('GET', '/api/getImage')
+                xhr.responseType = 'json'
+                xhr.onload = () => {
+                    this.imgList = xhr.response
+                    this.handleRender()
+                }
+                xhr.send()
+            }
+            handleRender() {
+                const {imgList} = this
+                let str = ''
+                imgList.forEach(img => {
+                    str += `<img src="${img}" />`
+                })
+                this.box.innerHTML = str
+            }
+        }
+
+        const page = new Page()
+        page.init()
+    </script>
+</body>
+</html>

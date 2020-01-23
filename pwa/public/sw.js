@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cache-v3'
+const CACHE_NAME = 'cache-v2'
 const CACHE_LIST = [
     '/',
     '/css/index.css',
@@ -7,6 +7,11 @@ const CACHE_LIST = [
 ]
 
 const handleCache = () => caches.open(CACHE_NAME).then(cache => cache.addAll(CACHE_LIST))
+
+const handleClearCache = () =>
+    caches.keys().then(keys => Promise.all(
+        keys.map(key => key !== CACHE_NAME && caches.delete(key))
+    ))
 
 self.addEventListener('fetch', e => {
     console.log(e.request.url)
@@ -27,7 +32,15 @@ self.addEventListener('install', e => {
 // install 方法中触发 skipWaiting
 // 用户手动点击 skipWaiting 的时候会触发这个方法
 // 浏览页面的过程中更新了 sw 文件, 关闭页面再打开新的页面会跳过这个方法直接进入激活状态
-self.addEventListener('activate', () => {
+self.addEventListener('activate', e => {
     console.log(`当前时间 ${Date.now()}: 代码走到了这里 activate`)
+    e.waitUntil(Promise.all([
+        handleClearCache(),
+        // Clients 接口的  claim() 方法允许一个激活的 service worker 将自己设置为其 scope
+        // 内所有clients 的controller . 这会在由此service worker 控制的任何 clients
+        // 中触发 navigator.serviceWorker  上的  "controllerchange"  事件.
+        // 也就是让当前的 sw 成为主导的 sw
+        self.clients.claim()
+    ]))
 })
 

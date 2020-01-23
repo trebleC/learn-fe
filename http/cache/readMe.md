@@ -17,3 +17,14 @@ PS: 如果文件设置了 Last-Modified, 下次访问时会命中浏览器默认
 3. 关闭浏览器再打开当前 url index.html 甚至都会命中强缓存 statusCode 为 200, Size tab 展示内容来自 disk cache
 
 项目中加入一张 svg 格式的内容以后, 打开 svg 文件没有修改其内部的内容直接保存的话刷新浏览器, 并不能命中缓存, 这是因为保存的时候文件的 modify-time 发生了改变导致的, 因此引入了根据文件内容创建 hash 值的 Etag 方式实现的缓存判断逻辑~
+
+## Etag / If-None-Match
+
+- 请求到来根据文件内容获取文件的 md5 值
+  - 对于小文件可以对整个文件进行哈希计算
+  - 对于大文件常用的方案是对文件名和文件的大小进行哈希计算并生成 md5
+- 读取请求头的 If-None-Match 并与之前步骤获取的 md5 值进行对比
+  - 若两个值相等直接返回 304 不再进行 Last-Modified 的比对(体现出 Etag 优先级高于 Last-Modified)
+  - 两个值不相等的话写入响应头 Etag 为新生成的 md5 值
+  - 进行字后的缓存判断逻辑 -> Last-Modified
+- 结束

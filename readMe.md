@@ -4,6 +4,7 @@
 
 #### 2020-01
 
+- [基于 prerender-spa-plugin 实现预渲染(仅适用于静态网站)](https://github.com/luoquanquan/learn-fe/tree/master/vue-ssr/prerender)
 - [自己写一个骨架屏插件](https://github.com/luoquanquan/learn-fe/blob/master/pwa/pwa-vue/my-skeleton-plugin.js)
 - [基于 vue 的 pwa 应用](https://github.com/luoquanquan/learn-fe/tree/master/pwa/pwa-vue)
 - [pwa & manifest.json 配置 & serviceWorker 配置](https://github.com/luoquanquan/learn-fe/tree/master/pwa)

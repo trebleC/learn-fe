@@ -1,4 +1,4 @@
-const SkeletonWebpackPlugin = require('vue-skeleton-webpack-plugin')
+const MyPlugin = require('./my-skeleton-plugin')
 const { resolve } = require('path')
 
 module.exports = {
@@ -25,7 +25,7 @@ module.exports = {
     },
     configureWebpack: {
         plugins: [
-            new SkeletonWebpackPlugin({
+            new MyPlugin({
                 webpackConfig: {
                     entry: {
                         app: resolve('./src/skeleton.js')

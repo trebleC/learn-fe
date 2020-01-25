@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <HelloWorld :msg="announce" />
   </div>
 </template>
 
@@ -10,9 +10,21 @@ import HelloWorld from './components/HelloWorld.vue'
 
 export default {
   name: 'app',
+  data() {
+    return {
+      announce: 'Welcome to Your Vue.js App'
+    }
+  },
   components: {
     HelloWorld
-  }
+  },
+  mounted() {
+    fetch('https://music.niubishanshan.top/api/v2/music/toplist')
+      .then(resp => resp.json())
+      .then(resp => {
+        this.announce = resp.announce
+      })
+  },
 }
 </script>
 

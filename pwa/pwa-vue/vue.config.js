@@ -30,6 +30,19 @@ module.exports = {
                     entry: {
                         app: resolve('./src/skeleton.js')
                     }
+                },
+                router: {
+                    mode: 'hash',
+                    routes: [
+                        {
+                            path: '/',
+                            skeletonId: 'Skeleton'
+                        },
+                        {
+                            path: '/about',
+                            skeletonId: 'SkeletonAbout'
+                        }
+                    ]
                 }
             })
         ]

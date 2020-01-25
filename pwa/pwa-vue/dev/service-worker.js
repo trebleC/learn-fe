@@ -13,4 +13,9 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 // 执行缓存操作
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
+workbox.routing.registerRoute(
+    o => o.url.href.includes('/pwa-vue-demo'),
+    workbox.strategies.staleWhileRevalidate()
+)
+
 console.log('自定义的缓存配置文件~')

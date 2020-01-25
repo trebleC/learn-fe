@@ -1,3 +1,6 @@
+const SkeletonWebpackPlugin = require('vue-skeleton-webpack-plugin')
+const { resolve } = require('path')
+
 module.exports = {
     pwa: {
         // 一些基础配置
@@ -19,5 +22,16 @@ module.exports = {
             swSrc: 'dev/service-worker.js',
             // ...other Workbox options...
         }
+    },
+    configureWebpack: {
+        plugins: [
+            new SkeletonWebpackPlugin({
+                webpackConfig: {
+                    entry: {
+                        app: resolve('./src/skeleton.js')
+                    }
+                }
+            })
+        ]
     }
 }

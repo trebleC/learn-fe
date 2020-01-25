@@ -6,6 +6,10 @@ const CACHE_LIST = [
     '/api/getImage'
 ]
 
+for(let i = 1; i < 9; i++) {
+    CACHE_LIST.push(`http://img.blog.niubishanshan.top/${i}.jpeg`)
+}
+
 const handleCache = () => caches.open(CACHE_NAME).then(cache => cache.addAll(CACHE_LIST))
 
 const handleClearCache = () =>
@@ -14,7 +18,9 @@ const handleClearCache = () =>
     ))
 
 self.addEventListener('fetch', e => {
-    console.log(e.request.url)
+    return e.respondWith(
+        fetch(e.request).catch(err => caches.open(CACHE_NAME).then(cache => cache.match(e.request)))
+    )
 })
 
 // sw.js 文件更新后的下次刷新进行安装

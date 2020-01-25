@@ -10,6 +10,12 @@ const conf = {
 const app = new Koa()
 const router = new KoaRouter()
 
+router.get('/pwa-vue-demo', ctx => {
+    ctx.body = {
+        announce: '圈圈的圈'
+    }
+})
+
 router.get('/api/getImage', ctx => {
     const ret = []
     while (ret.length < 99) {

@@ -1,6 +1,7 @@
 const Koa = require('koa')
 const KoaRouter = require('koa-router')
 const koaStatic = require('koa-static')
+const cors = require('@koa/cors')
 const path = require('path')
 
 const conf = {
@@ -25,6 +26,7 @@ router.get('/api/getImage', ctx => {
     ctx.body = ret
 })
 
+app.use(cors())
 app.use(router.routes(), router.allowedMethods())
 app.use(koaStatic(path.resolve(__dirname, 'public')))
 app.listen(conf.PORT, () => {

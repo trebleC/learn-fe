@@ -19,7 +19,7 @@ export default {
     HelloWorld
   },
   mounted() {
-    fetch('https://music.niubishanshan.top/api/v2/music/toplist')
+    fetch('http://127.0.0.1:3333/pwa-vue-demo')
       .then(resp => resp.json())
       .then(resp => {
         this.announce = resp.announce

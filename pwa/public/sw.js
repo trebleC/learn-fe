@@ -17,7 +17,20 @@ const handleClearCache = () =>
         keys.map(key => key !== CACHE_NAME && caches.delete(key))
     ))
 
+const fetchAndSave = request => fetch(request).then(resp => {
+    const r = resp.clone()
+    caches.open(CACHE_NAME).then(cache => cache.put(request, r))
+    return resp
+})
+
 self.addEventListener('fetch', e => {
+
+    if (e.request.url.includes('/api')) {
+        return e.respondWith(
+            fetchAndSave(e.request).catch(err => caches.open(CACHE_NAME).then(cache => cache.match(e.request)))
+        )
+    }
+
     return e.respondWith(
         fetch(e.request).catch(err => caches.open(CACHE_NAME).then(cache => cache.match(e.request)))
     )

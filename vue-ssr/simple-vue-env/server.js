@@ -16,6 +16,7 @@ const renderer = createBundleRenderer(serverBundle, { template })
 
 const app = new Koa()
 const router = new KoaRouter()
+app.use(koaStatic(path.resolve(__dirname, './dist')))
 
 router.get('/', async ctx => {
     try {
@@ -27,8 +28,16 @@ router.get('/', async ctx => {
     }
 })
 
+router.get('*', async ctx => {
+    try {
+        const htmlStr = await renderer.renderToString(ctx)
+        ctx.body = htmlStr
+    } catch (error) {
+        ctx.status = 502
+        ctx.body = 'Server Error'
+    }
+})
 app.use(router.routes(), router.allowedMethods())
-app.use(koaStatic(path.resolve(__dirname, './dist')))
 app.listen(conf.PORT, () => {
     console.log(`the server is listen on ${conf.PORT}`)
 })

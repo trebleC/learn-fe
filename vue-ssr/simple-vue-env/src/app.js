@@ -9,5 +9,5 @@ export default () => {
         render: h => h(App)
     })
 
-    return { app }
+    return { app, router }
 }

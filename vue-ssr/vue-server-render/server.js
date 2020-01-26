@@ -22,7 +22,7 @@ router.get('/', ctx => {
 
     renderer.renderToString(vm, (err, htmlStr) => {
         if (err) {
-            ctx.statusCode = 502
+            ctx.status = 502
             ctx.body = 'Server Error'
             return;
         }

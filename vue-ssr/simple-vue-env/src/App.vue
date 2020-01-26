@@ -1,19 +1,12 @@
 <template>
-    <div id="app">
-        <Foo/>
-        <Bar/>
-    </div>
+  <div id="app">
+    <router-link to="/">Foo</router-link>
+    <router-link to="/bar">Bar</router-link>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
-import Foo from "./components/Foo.vue";
-import Bar from "./components/Bar.vue";
-
-export default {
-  components: {
-    Foo,
-    Bar
-  }
-};
+export default {};
 </script>
 

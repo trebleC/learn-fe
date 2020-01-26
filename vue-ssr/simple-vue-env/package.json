@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "client:dev-server": "webpack-dev-server --mode development",
-    "client:dev-bundle": "webpack --mode development"
+    "client:dev": "webpack-dev-server --config ./config/webpack.client.js --mode development",
+    "client:build": "webpack --config ./config/webpack.client.js --mode development",
+    "server:build": "webpack --config ./config/webpack.server.js --mode development"
   },
   "keywords": [],
   "author": "",

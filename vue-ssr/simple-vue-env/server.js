@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const Koa = require('koa')
 const KoaRouter = require('koa-router')
+const koaStatic = require('koa-static')
 const { createBundleRenderer } = require('vue-server-renderer')
 
 
@@ -27,6 +28,7 @@ router.get('/', async ctx => {
 })
 
 app.use(router.routes(), router.allowedMethods())
+app.use(koaStatic(path.resolve(__dirname, './dist')))
 app.listen(conf.PORT, () => {
     console.log(`the server is listen on ${conf.PORT}`)
 })

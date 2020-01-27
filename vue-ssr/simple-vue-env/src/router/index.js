@@ -4,6 +4,7 @@ import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
 import Foo from '../components/Foo.vue'
+import Bar from '../components/Bar.vue'
 
 export default () => new VueRouter({
     mode: 'history',
@@ -13,7 +14,7 @@ export default () => new VueRouter({
             component: Foo
         }, {
             path: '/bar',
-            component: () => import('../components/Bar.vue')
+            component: Bar
         }
     ]
 })

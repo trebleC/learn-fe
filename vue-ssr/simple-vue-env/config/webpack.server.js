@@ -3,6 +3,7 @@ const path = require('path')
 const base = require('./webpack.base')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const VueSSRServerPlugin = require('vue-server-renderer/server-plugin')
+const externals = require('webpack-node-externals')
 
 module.exports = merge(base, {
     target: 'node',
@@ -12,6 +13,7 @@ module.exports = merge(base, {
     output: {
         libraryTarget: 'commonjs2'
     },
+    externals: [externals()],
     plugins: [
         new VueSSRServerPlugin(),
         new HtmlWebpackPlugin({

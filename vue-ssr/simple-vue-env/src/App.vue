@@ -7,6 +7,10 @@
 </template>
 
 <script>
-export default {};
+export default {
+  metaInfo: {
+    title: 'My Example App'
+  }
+};
 </script>
 

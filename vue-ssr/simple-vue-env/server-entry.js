@@ -16,6 +16,7 @@ export default context => new Promise(resolve => {
         })).then(() => {
             // 通过这一句会给生成的 html 中加上 window.__INITIAL_STATE__={"name":"quanquan"} 这一句
             context.state = store.state
+            context.meta = app.$meta()
             resolve(app)
         })
     })

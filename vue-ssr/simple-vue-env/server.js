@@ -30,7 +30,10 @@ router.get('/', async ctx => {
     }
 })
 
-router.get('*', async ctx => {
+router.get('*', async (ctx, next) => {
+    if (ctx.url.includes('.js')) {
+        return next()
+    }
     try {
         const htmlStr = await renderer.renderToString(ctx)
         ctx.body = htmlStr

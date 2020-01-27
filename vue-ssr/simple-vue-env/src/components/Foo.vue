@@ -9,6 +9,11 @@
 
 <script>
 export default {
+  // 服务端渲染的时候只走这个
+  asyncData(store) {
+    return store.dispatch('setName')
+  },
+  // 客户端渲染的时候只走这个
   mounted() {
     this.$store.dispatch('setName')
   },

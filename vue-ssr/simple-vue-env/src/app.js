@@ -13,5 +13,5 @@ export default () => {
         render: h => h(App)
     })
 
-    return { app, router }
+    return { app, router, store }
 }

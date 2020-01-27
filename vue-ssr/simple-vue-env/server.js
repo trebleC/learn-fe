@@ -10,9 +10,10 @@ const conf = {
     PORT: 3333
 }
 
-const serverBundle = fs.readFileSync(path.resolve(__dirname, './dist/server.bundle.js'), 'utf8')
+const serverBundle = require('./dist/vue-ssr-server-bundle')
+const clientManifest = require('./dist/vue-ssr-client-manifest')
 const template = fs.readFileSync(path.resolve(__dirname, './dist/index.ssr.html'), 'utf8')
-const renderer = createBundleRenderer(serverBundle, { template })
+const renderer = createBundleRenderer(serverBundle, { template, clientManifest })
 
 const app = new Koa()
 const router = new KoaRouter()

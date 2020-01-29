@@ -67,7 +67,7 @@ console.log(User === conn.model('User'))
     // const ret = await User.create(arr)
     // console.log(`当前时间 ${Date.now()}: debug 的数据是 ret: `, ret)
 
-    const data = await User.find()
+    const data = await User.findOne()
     console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
 
     process.exit(0)

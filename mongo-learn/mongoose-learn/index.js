@@ -67,7 +67,10 @@ console.log(User === conn.model('User'))
     // const ret = await User.create(arr)
     // console.log(`当前时间 ${Date.now()}: debug 的数据是 ret: `, ret)
 
-    const data = await User.findOne()
+    // find -> Array
+    // findOne -> Object
+    // findById -> Object
+    const data = await User.findById("5e31bb652c19826dce063747")
     console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
 
     process.exit(0)

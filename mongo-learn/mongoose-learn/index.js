@@ -70,7 +70,14 @@ console.log(User === conn.model('User'))
     // find -> Array
     // findOne -> Object
     // findById -> Object
-    const data = await User.findById("5e31bb652c19826dce063747")
+    // const data = await User.findById("5e31bb652c19826dce063747")
+    // console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
+
+    // 分页
+    const pageSize = 3
+    const currentPage = 2
+    // 执行顺序: 查找 -> 排序 -> 跳过 -> limit
+    const data = await User.find().skip(pageSize * (currentPage - 1)).limit(pageSize)
     console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
 
     process.exit(0)

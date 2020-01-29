@@ -1,10 +1,12 @@
 var i  = 0;
 
 var timeStart = Date.now()
+var arr = []
 while (i++ < 1e4) {
-    db.user.insert({name: 'quanquan' + i, age: i + 10})
+    arr.push({name: 'quanquan' + i, age: i + 10})
 }
 
+db.user.insert(arr)
 print(Date.now() - timeStart)
 
-// 耗时: 3821
+// 耗时: 112

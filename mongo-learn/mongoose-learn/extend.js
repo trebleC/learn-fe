@@ -20,10 +20,21 @@ userSchema.statics.findByName =  function(name) {
     return this.findOne({name})
 }
 
+userSchema.methods.findByName = function() {
+    console.log(`当前时间 ${Date.now()}: 代码走到了这里 userSchema.methods.findByName`)
+    return this.model('User').findOne({name: this.name})
+}
+
 const User = conn.model('User', userSchema)
 
 ;(async () => {
-    const doc = await User.findByName('quanquan')
+    const newUser = new User({
+        name: 'quanquan',
+        age: 28,
+        sex: 'male',
+        create_at: new Date()
+    })
+    const doc = await newUser.findByName()
     console.log(`当前时间 ${Date.now()}: debug 的数据是 doc: `, doc)
     process.exit(0)
 })()

@@ -50,7 +50,20 @@ console.log(User === conn.model('User'))
 
     // 删除
     // deleteOne deleteMany
-    const ret = await User.deleteMany({name: 'quanquan', age: 28})
+    // const ret = await User.deleteMany({name: 'quanquan', age: 28})
+    // console.log(`当前时间 ${Date.now()}: debug 的数据是 ret: `, ret)
+
+    // 查询
+    const arr = []
+    for (let i = 0; i < 10; i++) {
+        arr.push({
+            name: 'quanquan' + i,
+            age: 28 + i % 2,
+            sex: 'male',
+            create_at: new Date()
+        })
+    }
+    const ret = await User.create(arr)
     console.log(`当前时间 ${Date.now()}: debug 的数据是 ret: `, ret)
 
     process.exit(0)

@@ -38,13 +38,21 @@ console.log(User === conn.model('User'))
 
     // 修改
     // 默认自带合并功能不会覆盖
-    const ret = await User.updateOne({name: 'quanquan', age: 28}, {
-        $addToSet: {
-            hobby: {
-                $each: ['唱', '跳', 'rap', '篮球 1']
-            }
-        }
-    })
+    // updateOne, updateMany, or bulkWrite
+    // const ret = await User.updateOne({name: 'quanquan', age: 28}, {
+    //     $addToSet: {
+    //         hobby: {
+    //             $each: ['唱', '跳', 'rap', '篮球 1']
+    //         }
+    //     }
+    // })
+    // console.log(`当前时间 ${Date.now()}: debug 的数据是 ret: `, ret)
+
+    // 删除
+    // deleteOne deleteMany
+    const ret = await User.deleteMany({name: 'quanquan', age: 28})
     console.log(`当前时间 ${Date.now()}: debug 的数据是 ret: `, ret)
+
+    process.exit(0)
 })()
 

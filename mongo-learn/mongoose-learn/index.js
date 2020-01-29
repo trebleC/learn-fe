@@ -54,17 +54,21 @@ console.log(User === conn.model('User'))
     // console.log(`当前时间 ${Date.now()}: debug 的数据是 ret: `, ret)
 
     // 查询
-    const arr = []
-    for (let i = 0; i < 10; i++) {
-        arr.push({
-            name: 'quanquan' + i,
-            age: 28 + i % 2,
-            sex: 'male',
-            create_at: new Date()
-        })
-    }
-    const ret = await User.create(arr)
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 ret: `, ret)
+    // 先插入 10 条数据
+    // const arr = []
+    // for (let i = 0; i < 10; i++) {
+    //     arr.push({
+    //         name: 'quanquan' + i,
+    //         age: 28 + i % 2,
+    //         sex: 'male',
+    //         create_at: new Date()
+    //     })
+    // }
+    // const ret = await User.create(arr)
+    // console.log(`当前时间 ${Date.now()}: debug 的数据是 ret: `, ret)
+
+    const data = await User.find()
+    console.log(`当前时间 ${Date.now()}: debug 的数据是 data: `, data)
 
     process.exit(0)
 })()

@@ -15,7 +15,8 @@ conn.on('error', () => {
 const userSchema = new mongoose.Schema({
     name: String,
     age: Number,
-    sex: String
+    sex: String,
+    create_at: Date
 })
 
 const User = conn.model('User', userSchema)
@@ -25,7 +26,8 @@ console.log(User === conn.model('User'))
     const ret = await User.create({
         name: 'quanquan',
         age: 28,
-        sex: 'male'
+        sex: 'male',
+        create_at: new Date()
     })
     console.log(`当前时间 ${Date.now()}: debug 的数据是 ret: `, ret)
 })()

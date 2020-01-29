@@ -31,11 +31,25 @@ userSchema.virtual('userAge').get(function() {
     return `${this.name}:${this.age}`
 })
 
+// 钩子 pre post
+userSchema.pre('save', function(next) {
+    console.log(`当前时间 ${Date.now()}: 代码走到了这里 userSchema.pre('save'`)
+    this.name = 'pre-' + this.name
+    next()
+})
+
 const User = conn.model('User', userSchema)
 
 ;(async () => {
-    const doc = await User.findByName('quanquan')
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 doc.userAge: `, doc.userAge)
+    const user = new User({
+        name: 'quanquan',
+        age: 90,
+        sex: 'male',
+        create_at: new Date()
+    })
+    const {_id} = await user.save()
+    const {name} = await User.findById(_id)
+    console.log(`当前时间 ${Date.now()}: debug 的数据是 name: `, name)
     process.exit(0)
 })()
 

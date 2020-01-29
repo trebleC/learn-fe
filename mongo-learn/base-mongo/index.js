@@ -3,7 +3,7 @@ var i  = 0;
 
 var timeStart = Date.now()
 var arr = []
-while (i++ < 1e4) {
+while (i++ < 1e5) {
     arr.push({name: 'quanquan' + i, age: i + 10})
 }
 

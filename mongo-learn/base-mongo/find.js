@@ -7,3 +7,4 @@ cursor.forEach(item => {
 print('耗时:', Date.now() - timeStart)
 
 // 耗时: 52
+// 创建索引后耗时: 7

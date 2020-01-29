@@ -20,22 +20,22 @@ userSchema.statics.findByName =  function(name) {
     return this.findOne({name})
 }
 
+// 通过 userSchema.methods 给每个文档的实例添加方法
 userSchema.methods.findByName = function() {
     console.log(`当前时间 ${Date.now()}: 代码走到了这里 userSchema.methods.findByName`)
     return this.model('User').findOne({name: this.name})
 }
 
+// 虚拟属性存在但是不存在与数据库中, 通过两个 Or 多个字段计算得来
+userSchema.virtual('userAge').get(function() {
+    return `${this.name}:${this.age}`
+})
+
 const User = conn.model('User', userSchema)
 
 ;(async () => {
-    const newUser = new User({
-        name: 'quanquan',
-        age: 28,
-        sex: 'male',
-        create_at: new Date()
-    })
-    const doc = await newUser.findByName()
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 doc: `, doc)
+    const doc = await User.findByName('quanquan')
+    console.log(`当前时间 ${Date.now()}: debug 的数据是 doc.userAge: `, doc.userAge)
     process.exit(0)
 })()
 

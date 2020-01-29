@@ -42,10 +42,13 @@ const Cart = conn.model('Cart', CartSchema)
     //     user: user._id
     // })
     // console.log(`当前时间 ${Date.now()}: debug 的数据是 product: `, product)
-    const {user} = await Cart.findById('5e31c37ac1b81976794eaff8')
-    const userInfo = await User.findById(user)
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 userInfo: `, userInfo)
+    const productInfo = await Cart.findById('5e31c37ac1b81976794eaff8')
+        // 这个 user 的意思是要对 Cart 文档的 user 字段进行 populate(填充)
+        .populate('user', {
+            name: 1, _id: 0
+        })
 
+    console.log(`当前时间 ${Date.now()}: debug 的数据是 productInfo: `, productInfo)
     process.exit(0)
 })()
 

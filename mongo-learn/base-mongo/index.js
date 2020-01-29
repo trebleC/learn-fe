@@ -1,3 +1,4 @@
+var db = connect('users')
 var i  = 0;
 
 var timeStart = Date.now()

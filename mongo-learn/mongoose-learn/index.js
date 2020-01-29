@@ -16,13 +16,18 @@ const userSchema = new mongoose.Schema({
     name: String,
     age: Number,
     sex: String,
-    create_at: Date
+    create_at: Date,
+    hobby: {
+        type: Array,
+        default: []
+    }
 })
 
 const User = conn.model('User', userSchema)
 
 console.log(User === conn.model('User'))
 ;(async () => {
+    // 新增
     const ret = await User.create({
         name: 'quanquan',
         age: 28,

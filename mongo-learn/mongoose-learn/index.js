@@ -28,11 +28,22 @@ const User = conn.model('User', userSchema)
 console.log(User === conn.model('User'))
 ;(async () => {
     // 新增
-    const ret = await User.create({
-        name: 'quanquan',
-        age: 28,
-        sex: 'male',
-        create_at: new Date()
+    // const ret = await User.create({
+    //     name: 'quanquan',
+    //     age: 28,
+    //     sex: 'male',
+    //     create_at: new Date()
+    // })
+    // console.log(`当前时间 ${Date.now()}: debug 的数据是 ret: `, ret)
+
+    // 修改
+    // 默认自带合并功能不会覆盖
+    const ret = await User.updateOne({name: 'quanquan', age: 28}, {
+        $addToSet: {
+            hobby: {
+                $each: ['唱', '跳', 'rap', '篮球 1']
+            }
+        }
     })
     console.log(`当前时间 ${Date.now()}: debug 的数据是 ret: `, ret)
 })()

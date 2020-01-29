@@ -28,20 +28,23 @@ const CartSchema = new mongoose.Schema({
 const Cart = conn.model('Cart', CartSchema)
 
 ;(async () => {
-    const user = await User.create({
-        name: 'quanquan',
-        age: 28,
-        sex: 'male',
-        create_at: new Date()
-    })
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 user: `, user)
+    // const user = await User.create({
+    //     name: 'quanquan',
+    //     age: 28,
+    //     sex: 'male',
+    //     create_at: new Date()
+    // })
+    // console.log(`当前时间 ${Date.now()}: debug 的数据是 user: `, user)
 
-    const product = await Cart.create({
-        productName: 'switch',
-        price: 1800,
-        user: user._id
-    })
-    console.log(`当前时间 ${Date.now()}: debug 的数据是 product: `, product)
+    // const product = await Cart.create({
+    //     productName: 'switch',
+    //     price: 1800,
+    //     user: user._id
+    // })
+    // console.log(`当前时间 ${Date.now()}: debug 的数据是 product: `, product)
+    const {user} = await Cart.findById('5e31c37ac1b81976794eaff8')
+    const userInfo = await User.findById(user)
+    console.log(`当前时间 ${Date.now()}: debug 的数据是 userInfo: `, userInfo)
 
     process.exit(0)
 })()

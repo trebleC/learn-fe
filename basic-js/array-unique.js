@@ -103,3 +103,23 @@ const unique5 = arr => {
 }
 
 renderResult(origin, unique5)
+
+const unique6 = arr => {
+    const ret = arr.slice().sort((a, b) => a - b)
+
+    const loop = idx => {
+        if(idx === 0) {
+            return ret
+        }
+
+        if (ret[idx] === ret[--idx]) {
+            ret.splice(idx, 1)
+        }
+
+        return loop(idx)
+    }
+
+    return loop(ret.length)
+}
+
+renderResult(origin, unique6)

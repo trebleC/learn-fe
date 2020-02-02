@@ -31,7 +31,7 @@ renderResult(origin, unique)
 
 const unique2 = arr => {
     const ret = []
-    arr.sort()
+    arr = arr.slice().sort()
 
     for (let i = 0, len = arr.length; i < len; i++) {
         const curItem = arr[i]

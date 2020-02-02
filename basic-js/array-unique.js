@@ -65,5 +65,4 @@ const unique3 = arr => {
     return ret
 }
 
-
 renderResult(origin, unique3)

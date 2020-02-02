@@ -123,3 +123,20 @@ const unique6 = arr => {
 }
 
 renderResult(origin, unique6)
+
+const unique7 = arr => {
+    const ret = []
+
+    // forEach 结合 indexOf
+    // map filter... 可以作为遍历方法
+    // includes find findIndex 可以作为筛选方法可以有很多变种
+    arr.forEach(item => {
+        if(ret.indexOf(item) === -1) {
+            ret.push(item)
+        }
+    })
+
+    return ret
+}
+
+renderResult(origin, unique7)

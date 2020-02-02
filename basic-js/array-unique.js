@@ -28,3 +28,19 @@ const unique = arr => {
 }
 
 renderResult(origin, unique)
+
+const unique2 = arr => {
+    const ret = []
+    arr.sort()
+
+    for (let i = 0, len = arr.length; i < len; i++) {
+        const curItem = arr[i]
+        if (curItem !== ret[ret.length - 1]) {
+            ret.push(curItem)
+        }
+    }
+
+    return ret
+}
+
+renderResult(origin, unique2)

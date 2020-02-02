@@ -140,3 +140,12 @@ const unique7 = arr => {
 }
 
 renderResult(origin, unique7)
+
+const unique8 = arr => {
+    return arr.reduce(
+        (prev, current) => prev.includes(current) ? prev : [...prev, current],
+        []
+    )
+}
+
+renderResult(origin, unique8)

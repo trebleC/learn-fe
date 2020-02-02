@@ -66,3 +66,20 @@ const unique3 = arr => {
 }
 
 renderResult(origin, unique3)
+
+const unique4 = arr => {
+    const obj = {}
+    const ret = []
+
+    for (let i = 0, len = arr.length; i < len; i++) {
+        const curItem = arr[i]
+        if (!obj[curItem]) {
+            obj[curItem] = 1
+            ret.push(curItem)
+        }
+    }
+
+    return ret
+}
+
+renderResult(origin, unique4)

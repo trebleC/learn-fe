@@ -149,3 +149,9 @@ const unique8 = arr => {
 }
 
 renderResult(origin, unique8)
+
+const unique9 = arr => {
+    return [...new Set(arr)]
+}
+
+renderResult(origin, unique9)

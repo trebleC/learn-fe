@@ -83,3 +83,23 @@ const unique4 = arr => {
 }
 
 renderResult(origin, unique4)
+
+const unique5 = arr => {
+    const ret = arr.slice()
+    let len = ret.length
+
+    for (let i = 0; i < len; i++) {
+        const curItem = ret[i]
+        for (let j = i + 1; j < len; j++) {
+            if (curItem === ret[j]) {
+                ret.splice(j, 1)
+                len--
+                j--
+            }
+        }
+    }
+
+    return ret
+}
+
+renderResult(origin, unique5)

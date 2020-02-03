@@ -8,8 +8,8 @@ const renderResult = (origin, unique) => {
 
 // 第一种, 最古老的方法
 const unique = arr => {
-    let repeat = false
     const ret = []
+    let repeat = false
 
     for (let i = 0, len = arr.length; i < len; i++) {
         repeat = false

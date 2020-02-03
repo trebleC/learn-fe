@@ -1,4 +1,4 @@
-const origin = [1, 2, 3, 4, 2, 1]
+const origin = [1, 2, 3, 4, 2, 6, 1]
 
 const renderResult = (origin, unique) => {
     console.log(`方法 ${unique.name}: `)
@@ -8,10 +8,12 @@ const renderResult = (origin, unique) => {
 
 // 第一种, 最古老的方法
 const unique = arr => {
-    let repeat
+    let repeat = false
     const ret = []
 
     for (let i = 0, len = arr.length; i < len; i++) {
+        repeat = false
+
         for (let j = 0, length = ret.length; j < length; j++) {
             if (ret[j] === arr[i]) {
                 repeat = true

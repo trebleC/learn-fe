@@ -17,6 +17,7 @@ li {
   height: 100%;
   overflow-y: scroll;
   -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 .container .content::-webkit-scrollbar {
   display: none;

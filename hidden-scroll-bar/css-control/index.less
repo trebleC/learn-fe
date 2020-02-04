@@ -19,6 +19,11 @@ ul, li {
         height: 100%;
         overflow-y: scroll;
 
+        // Chrome Safari
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
         li {
             margin: 10px 0;
             text-align: center;

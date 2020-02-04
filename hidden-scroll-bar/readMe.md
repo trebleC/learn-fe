@@ -7,3 +7,4 @@ PS: 本示例中样式文件都是由 less 编写, 基于 vscode 的 [Easy LESS]
 - [::-webkit-scrollbar](https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar)
 - [-ms-overflow-style](https://developer.mozilla.org/en-US/docs/Web/CSS/-ms-overflow-style)
 - [scrollbar-width](https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-width)
+- [firefox-releasenotes](https://www.mozilla.org/en-US/firefox/64.0/releasenotes/)

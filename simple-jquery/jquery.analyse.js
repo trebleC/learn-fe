@@ -325,6 +325,18 @@
     // Give the init function the jQuery prototype for later instantiation
     jQuery.fn.init.prototype = jQuery.fn;
 
+    /**
+     * 1. 定义一些变量 var
+     * 2. 查看是否是深拷贝 if
+     * 3. 参数校验 if
+     * 4. 查看是否是拓展 jQ 插件 if
+     * 5. 处理多个参数(对象) for
+     * 6. 处理循环引用 if
+     * 7. 深拷贝 if
+     * 8. 浅拷贝 else if
+     * 把一个方法扩展到 JQ下 ==》 术语：扩展静态方法 jQuery.extend
+     * 把一个方法扩展到原型下 ==》 术语：扩展实例方法 jQuery.fn.extend
+     */
     jQuery.extend = jQuery.fn.extend = function() {
         var options, name, src, copy, copyIsArray, clone,
             target = arguments[0] || {},

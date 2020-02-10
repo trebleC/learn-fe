@@ -57,6 +57,49 @@
         core_hasOwn = class2type.hasOwnProperty,
         core_trim = core_version.trim,
 
+        /*
+            常规面向对象写法
+            function Person() {}
+            Person.prototype = {
+                init: function() {}
+            }
+            var quanquan = new Person()
+            quanquan.init()
+
+            // 定义 jQuery
+            const jQuery = function () {
+                return new jQuery.fn.init()
+            }
+            // 定义 jQuery 原型
+            jQuery.fn = jQuery.prototype = {
+                init: function() {
+                    this.name = 'quanquan'
+                    return this
+                },
+                css() {
+                    console.log(`当前时间 ${Date.now()}: 代码走到了这里 我是 Css method`)
+                }
+            }
+            // 这里要执行链式调用，所以 jQuery() 应该返回一个 jQ 对象，尴尬了没有 new
+            jQuery()
+                .css()
+
+            // 但是如果这么写看上去就很 OK 啦
+            jQuery = function( selector, context ) {
+                // 但是此时的构造函数明显是 jQuery.prototype.init new 出来的实例也是它的实例，
+                // 且css方法明明是 jQuery 的实例方法
+                return new jQuery.fn.init();
+            },
+
+            // 所以就有了下边这句很经典的话啦
+            // jQuery.fn.init.prototype = jQuery.fn;
+
+            jQuery = function( selector, context ) {
+                return new jQuery.fn.init( selector, context, rootjQuery );
+            }
+            // 如上所述，由于 jQuery.fn.init 和 jQuery 原型指向相同，所以实例方法也是一样的
+            // 所以 ...
+        */
         // Define a local copy of jQuery
         jQuery = function( selector, context ) {
             // The jQuery object is actually just the init constructor 'enhanced'

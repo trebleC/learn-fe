@@ -62,7 +62,7 @@
                         }
 
                         target[name] = jQuery.extend(deep, clone, copy)
-                    } else {
+                    } else if (copy !== undefined) {
                         target[name] = copy
                     }
                 }

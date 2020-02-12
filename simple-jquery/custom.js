@@ -47,6 +47,11 @@
             target = {}
         }
 
+        if (i === length) {
+            target = this
+            i--
+        }
+
         for (; i < length; i++) {
             if ((options = arguments[i]) != null) {
                 for (name in options) {
@@ -77,9 +82,11 @@
     }
 
 
-    jQuery.isPlainObject = function (obj) {
-        return obj && Object.prototype.toString.call(obj) === '[object Object]'
-    }
+    jQuery.extend({
+        isPlainObject(obj) {
+            return obj && Object.prototype.toString.call(obj) === '[object Object]'
+        }
+    })
 
     root.$ = root.jQuery = jQuery
 })(window)

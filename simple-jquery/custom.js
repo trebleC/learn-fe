@@ -14,5 +14,33 @@
     }
 
     jQuery.fn.init.prototype = jQuery.fn
+
+    /**
+     * 1. 定义一些变量 var
+     * 2. 查看是否是深拷贝 if
+     * 3. 参数校验 if => target 参数必须是可拓展类型: 对象 or 函数
+     * 4. 查看是否是拓展 jQ 插件 if
+     * 5. 处理多个参数(对象) for
+     * 6. 处理循环引用 if
+     * 7. 深拷贝 if
+     * 8. 浅拷贝 else if
+     */
+    jQuery.extend = jQuery.fn.extend = function() {
+        let i = 1
+        let target = arguments[0]
+        let length = arguments.length
+        let name
+        let options
+
+        for (; i < length; i++) {
+            if ((options = arguments[i]) != null) {
+                for (name in options) {
+                    target[name] = options[name]
+                }
+            }
+        }
+
+        return target
+    }
     root.$ = root.jQuery = jQuery
 })(window)

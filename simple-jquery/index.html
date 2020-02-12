@@ -11,7 +11,20 @@
     <script src="./custom.js"></script>
 
     <script>
-        console.log($().css())
+        const info = {
+            name: 'quanquan',
+            sex: 'male',
+            age: 27
+        }
+
+        const extInfo = {
+            sport: 'running',
+            age: 28
+        }
+
+        const totalInfo = $.extend(info, extInfo)
+
+        console.log(`当前时间 ${Date.now()}: debug 的数据是 totalInfo: `, totalInfo)
     </script>
 </body>
 </html>

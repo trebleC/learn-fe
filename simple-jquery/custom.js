@@ -4,7 +4,7 @@
     }
 
     jQuery.fn = jQuery.prototype = {
-        init: function() {
+        init: function () {
             this.name = 'quanquan'
             return this
         },
@@ -25,22 +25,57 @@
      * 7. 深拷贝 if
      * 8. 浅拷贝 else if
      */
-    jQuery.extend = jQuery.fn.extend = function() {
+    jQuery.extend = jQuery.fn.extend = function () {
         let i = 1
         let target = arguments[0]
         let length = arguments.length
         let name
         let options
+        let src
+        let copy
+        let clone
+        let copyIsArray
+        let deep = false
+
+        if (typeof target === 'boolean') {
+            i = 2
+            deep = target
+            target = arguments[1]
+        }
+
+        if (typeof target !== 'object' && typeof target !== 'function') {
+            target = {}
+        }
 
         for (; i < length; i++) {
             if ((options = arguments[i]) != null) {
                 for (name in options) {
-                    target[name] = options[name]
+                    src = target[name]
+                    copy = options[name]
+
+                    if (deep && (jQuery.isPlainObject(copy) || (copyIsArray = Array.isArray(copy)))) {
+                        if (copyIsArray) {
+                            copyIsArray = false
+                            clone = src && Array.isArray(src) ? src : []
+                        } else {
+                            clone = src && typeof jQuery.isPlainObject(src) ? src : {}
+                        }
+
+                        target[name] = jQuery.extend(deep, clone, copy)
+                    } else {
+                        target[name] = copy
+                    }
                 }
             }
         }
 
         return target
     }
+
+
+    jQuery.isPlainObject = function (obj) {
+        return obj && Object.prototype.toString.call(obj) === '[object Object]'
+    }
+
     root.$ = root.jQuery = jQuery
 })(window)

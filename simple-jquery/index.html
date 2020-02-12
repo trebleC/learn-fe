@@ -18,7 +18,7 @@
             age: 27,
             like: {
                 run: '5km',
-                eat: ['rice', 'mantou'],
+                eat: ['rice', 'mantou']
             }
         }
 
@@ -28,9 +28,11 @@
             like: {
                 run: '10km',
                 eat: ['youtiao'],
-            }
+            },
         }
 
+        extInfo.extInfo = info
+        info.extInfo = info
         const totalInfo = $.extend(true, info, extInfo)
 
         console.log(`当前时间 ${Date.now()}: debug 的数据是 totalInfo: `, totalInfo)

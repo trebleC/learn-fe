@@ -53,6 +53,10 @@
                     src = target[name]
                     copy = options[name]
 
+                    if (target === copy) {
+                        continue
+                    }
+
                     if (deep && (jQuery.isPlainObject(copy) || (copyIsArray = Array.isArray(copy)))) {
                         if (copyIsArray) {
                             copyIsArray = false

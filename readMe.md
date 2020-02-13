@@ -4,6 +4,7 @@
 
 #### 2020-02
 
+- [快速排序](./basic-js/array-sort/quickSort.js)
 - [选择排序](./basic-js/array-sort/selectionSort.js)
 - [冒泡排序](./basic-js/array-sort/bubbleSort.js)
 - [隐藏滚动条](./hidden-scroll-bar)

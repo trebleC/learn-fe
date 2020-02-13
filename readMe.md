@@ -4,6 +4,7 @@
 
 #### 2020-02
 
+- [选择排序](./basic-js/array-sort/selectionSort.js)
 - [冒泡排序](./basic-js/array-sort/bubbleSort.js)
 - [隐藏滚动条](./hidden-scroll-bar)
 - [数组去重](./basic-js/array-unique.js)

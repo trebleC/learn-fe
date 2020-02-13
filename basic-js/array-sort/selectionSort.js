@@ -1,5 +1,5 @@
 const {swap, createRandomArr} = require('./utils')
-const randomArr = createRandomArr(10, 0, 20);
+const randomArr = createRandomArr(10, 0, 20)
 
 const selectionSort = array => {
     let len = array.length

@@ -1,5 +1,5 @@
 const {swap, createRandomArr} = require('./utils')
-const randomArr = createRandomArr(1e4, 0, 1e8);
+const randomArr = createRandomArr(1e4, 0, 1e8)
 
 
 const bubbleSort = array => {

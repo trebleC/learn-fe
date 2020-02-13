@@ -7,12 +7,10 @@ const bubbleSort = array => {
 
     for (let outerIndex = 0; outerIndex < len; outerIndex++) {
         for (let innerIndex = 0; innerIndex < len - 1; innerIndex++) {
-            console.log(array[innerIndex], array[innerIndex + 1])
             if (array[innerIndex] > array[innerIndex + 1]) {
                 swap(array, innerIndex, innerIndex + 1)
             }
         }
-        console.log(array)
     }
 }
 

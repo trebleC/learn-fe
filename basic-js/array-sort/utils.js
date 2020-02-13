@@ -16,3 +16,9 @@ exports.createRandomArr = (len, min, max) => {
     return ret
 }
 
+exports.swap = (array, initPos, targetPos) => {
+    const temp = array[targetPos]
+    array[targetPos] = array[initPos]
+    array[initPos] = temp
+}
+

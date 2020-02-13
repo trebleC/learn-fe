@@ -1,6 +1,5 @@
-const { swap } = require('./utils')
-const randomArr = [0, 10, 9, 2, 1]
-
+const {swap, createRandomArr} = require('./utils')
+const randomArr = createRandomArr(1e6, 0, 1e8)
 
 const quickSort = array => {
     const len = array.length
@@ -26,9 +25,8 @@ const quickSort = array => {
 
 const quickSortArray = randomArr.slice()
 console.time('quickSort')
-const quickSortedArray = quickSort(quickSortArray)
+quickSort(quickSortArray)
 console.timeEnd('quickSort')
-console.log(`当前时间 ${Date.now()}: debug 的数据是 quickSortedArray: `, quickSortedArray)
 
 const partition = (array, left, right) => {
     const pivot = array[Math.floor((left + right) / 2)]
@@ -69,4 +67,3 @@ const qSortArray = randomArr.slice()
 console.time('qSort')
 qSort(qSortArray)
 console.timeEnd('qSort')
-console.log(`当前时间 ${Date.now()}: debug 的数据是 qSortArray: `, qSortArray)

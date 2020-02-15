@@ -4,6 +4,7 @@
 
 #### 2020-02
 
+- [XSS 漏洞示例](./web-security/xss/)
 - [归并排序](./basic-js/array-sort/mergeSort.js)
 - [快速排序](./basic-js/array-sort/quickSort.js)
 - [选择排序](./basic-js/array-sort/selectionSort.js)

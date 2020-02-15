@@ -1,9 +1,12 @@
 const Koa = require('koa')
 const KoaRouter  =require('koa-router')
 const KoaStatic = require('koa-static')
+const KoaBody = require('koa-body')
 const conf = {
     PORT: 3333
 }
+
+const users = ['周杰伦', '刘德华']
 
 const app = new Koa()
 const router = new KoaRouter()
@@ -25,6 +28,18 @@ router.get('/reflect.html', (ctx) => {
         </html>
     `
 })
+
+router.post('/write', (ctx) => {
+    const {userName} = ctx.request.body
+    users.push(userName)
+    ctx.redirect('/read.html')
+})
+
+router.get('/users', (ctx) => {
+    ctx.body = users
+})
+
+app.use(KoaBody())
 app.use(router.routes(), router.allowedMethods())
 app.listen(conf.PORT, () => {
     console.log(`the server is listening on ${conf.PORT}`)

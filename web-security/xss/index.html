@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XSS 攻击演示项目</title>
+</head>
+<body>
+
+    <h1>hello XSS</h1>
+
+    <!-- hash 值: encodeURIComponent('<img src=# onerror=alert("DOM型XSS")>') -->
+    <a href="./dom.html#%3Cimg%20src%3D%23%20onerror%3Dalert(%22DOM%E5%9E%8BXSS%22)%3E">DOM 型</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</body>
+</html>

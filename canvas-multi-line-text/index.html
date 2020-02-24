@@ -11,13 +11,19 @@
 
     <textarea id="area" style="border: 1px solid #333; width: 300px; height: 300px; resize: none; padding: 0;"></textarea>
     <br>
-    <canvas id='cns' width="300" height="300" style="border: 1px solid #333;"></canvas>
+    <canvas id='cns' style="border: 1px solid #333;"></canvas>
     <script>
         const cns = document.querySelector('#cns')
         const area = document.querySelector('#area')
         const ctx = cns.getContext('2d')
 
+        ratio = window.devicePixelRatio || 1
 
+        cns.width = ratio * 300
+        cns.height = ratio * 300
+
+        cns.style.width = 300 + 'px'
+        cns.style.height = 300 + 'px'
         area.oninput = function (e) {
             const { value } = e.target
             fillMultiplelinesText(ctx, 26, 32, value)

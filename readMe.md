@@ -4,6 +4,7 @@
 
 #### 2020-02
 
+- [canvas 实现多行文本自动换行](./canvas-multi-line-text/index.html)
 - [CSRF 漏洞示例](./web-security/csrf/)
 - [XSS 漏洞示例](./web-security/xss/)
 - [归并排序](./basic-js/array-sort/mergeSort.js)

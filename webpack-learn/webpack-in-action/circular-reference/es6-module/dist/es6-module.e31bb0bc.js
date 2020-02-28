@@ -129,8 +129,17 @@ var _foo = _interopRequireDefault(require("./foo"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-console.log('value of foo: ', _foo.default);
-var _default = 'this is bar.js';
+var invoked = false;
+
+function bar(invoker) {
+  if (!invoked) {
+    invoked = true;
+    console.log(invoker, ' invokes bar.js');
+    (0, _foo.default)('bar.js');
+  }
+}
+
+var _default = bar;
 exports.default = _default;
 },{"./foo":"foo.js"}],"foo.js":[function(require,module,exports) {
 "use strict";
@@ -144,13 +153,21 @@ var _bar = _interopRequireDefault(require("./bar"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-console.log('value of bar: ', _bar.default);
-var _default = 'this is foo.js';
+function foo(invoker) {
+  console.log(invoker, ' invokes foo.js');
+  (0, _bar.default)('foo.js');
+}
+
+var _default = foo;
 exports.default = _default;
 },{"./bar":"bar.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
-require("./foo.js");
+var _foo = _interopRequireDefault(require("./foo.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+(0, _foo.default)('index.js');
 },{"./foo.js":"foo.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -179,7 +196,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52674" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61790" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

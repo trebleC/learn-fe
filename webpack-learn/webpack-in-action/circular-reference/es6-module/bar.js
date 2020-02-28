@@ -1,3 +1,11 @@
 import foo from './foo'
-console.log('value of foo: ', foo)
-export default 'this is bar.js'
+let invoked = false
+
+function bar(invoker) {
+    if (!invoked) {
+        invoked = true
+        console.log(invoker, ' invokes bar.js')
+        foo('bar.js')
+    }
+}
+export default bar

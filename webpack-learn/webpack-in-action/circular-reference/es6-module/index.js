@@ -1,1 +1,2 @@
-import './foo.js'
+import foo from './foo.js'
+foo('index.js')

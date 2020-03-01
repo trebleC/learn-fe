@@ -377,16 +377,48 @@
         return result;
     };
 
+    /**
+     * 获取对象的单层属性值
+     * @param {String} key 属性名
+     * @return {Function} 闭包
+     * @example shallowProperty('name')({name: 'quanquan'}) // quanquan
+     * 简直巧妙
+     */
     var shallowProperty = function (key) {
         return function (obj) {
             return obj == null ? void 0 : obj[key];
         };
     };
 
+    /**
+     * 判断对象是否包含某个属性, 只判断对象自己的属性不判断 __proto__ 上的属性
+     * 关键: hasOwnProperty
+     * @param {Object} obj 需要判断的对象
+     * @param {Sring} path 属性名
+     * @return {Bool} 是否包含属性
+     * @example
+     *    function A () {}
+     *    A.prototype = {name: 'quanquan'}
+     *    var b = new A()
+     *    'name' in b // true
+     *    has(b, 'name')
+     *    A.prototype.sex = 'male'
+     *    'sex' in b // true 这一行证明了 prototype 是引用型. 原型变了其构造函数生产的对象
+     *    // 会跟着改变
+     */
     var has = function (obj, path) {
         return obj != null && hasOwnProperty.call(obj, path);
     }
 
+    /**
+     * 获取深层对象的属性值
+     * @param {Object} obj 需要获取属性的对象
+     * @param {Array} path 属性路径
+     * @return {any} 对象的属性值
+     * @example
+     *    deepGet({person: {single: {name: 'quanquan', friend: {name: 'tony'}}}},
+     *    ['person', 'single', 'friend', 'name']) // tony
+     */
     var deepGet = function (obj, path) {
         var length = path.length;
         for (var i = 0; i < length; i++) {
@@ -400,7 +432,11 @@
     // should be iterated as an array or as an object.
     // Related: https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength
     // Avoids a very nasty iOS 8 JIT bug on ARM-64. #2094
+
+    // Math.pow(2, 53) - 1 === Number.MAX_SAFE_INTEGER 是 js 能够表示的最大安全整数
     var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
+
+    // 缓存 getLength 方法, 这样的话获取(类)数组的长度的时候直接 getLength(arrLike) 就可以了
     var getLength = shallowProperty('length');
     var isArrayLike = function (collection) {
         var length = getLength(collection);

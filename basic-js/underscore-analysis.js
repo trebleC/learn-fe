@@ -444,14 +444,28 @@
     };
 
     // Collection Functions
+    // 集合(Array || Object)拓展方法
     // --------------------
 
     // The cornerstone, an `each` implementation, aka `forEach`.
     // Handles raw objects in addition to array-likes. Treats all
     // sparse array-likes as if they were dense.
+    /**
+     * 实现一个 ES5 forEach
+     * @param {Array} obj 将要被迭代的数组 or 类数组对象
+     * @param {Function} iteratee 迭代函数, 迭代过程中对每个元素都要调用该函数
+     * @param {Object} context 上下文对象, 迭代函数 iteratee 中的 this 指向
+     * @description 避免传递一个不固定length属性的对象 (注: 对象或数组的长度 (length) 属性要固定的)
+     * @description 每个循环不能被破坏. 若要查找某个元素, 应该使用  _.find 代替
+     */
     _.each = _.forEach = function (obj, iteratee, context) {
+        // 优化回调函数
+        // 如果指定了 context 执行 func.apply(context, arguments);
+        // 否则直接执行 func
         iteratee = optimizeCb(iteratee, context);
         var i, length;
+
+        // 数组和对象采用不同的迭代方式
         if (isArrayLike(obj)) {
             for (i = 0, length = obj.length; i < length; i++) {
                 iteratee(obj[i], i, obj);
@@ -462,14 +476,31 @@
                 iteratee(obj[keys[i]], keys[i], obj);
             }
         }
+
+        // 尾部返回 obj 参数, 供链式调用使用. 此功能是 Array.prototype.forEach 没有的
         return obj;
     };
 
     // Return the results of applying the iteratee to each element.
+    /**
+     * 实现一个 ES5 map
+     * @param {Array} obj 将要被迭代的数组
+     * @param {Function} iteratee 迭代函数, 迭代过程中对每个元素都要调用该函数
+     * @param {Object} context 上下文对象, 迭代函数 iteratee 中的 this 指向
+     * @returns {Array} 对集合中每个元素执行迭代方法后构成的数组
+     * @example
+     *    _.map([1,2,3], item => item * 2) // [2,4,4]
+     */
     _.map = _.collect = function (obj, iteratee, context) {
         iteratee = cb(iteratee, context);
+
+        // 如果传入的 obj 是一个数组(or 类数组对象) keys 为 false
+        // 如果是对象字面量, keys 为对象的 key 组成的数组
         var keys = !isArrayLike(obj) && _.keys(obj),
             length = (keys || obj).length,
+
+            // 创建用于缓存对象的结果, 这里直接创建一个指定长度的数组, 应该是为了编译优化之类
+            // jQ 的源码里边没有这样写, 而是直接 var ret = [] 的
             results = Array(length);
         for (var index = 0; index < length; index++) {
             var currentKey = keys ? keys[index] : index;
@@ -478,27 +509,80 @@
         return results;
     };
 
+    // 怒贴一个 reduce 的实现
+    Array.prototype.myreduce = function (cb, memo) {
+        for (let i = 0; i < this.length; i++) {
+            if (!memo) {
+                memo = cb(this[i], this[i + 1], i, this)
+                i++;
+            } else {
+                memo = cb(memo, this[i], i, this)
+            }
+        }
+        return memo
+    }
+
+    Array.prototype.myreduce2 = function (cb, memo) {
+        let i = 0;
+        const len = arr.length
+
+        // 没有传入初始值
+        if (!memo) {
+            memo = arr[i]
+            i++
+        }
+
+        while (i < len) {
+            memo = cb(memo, arr[i], i, arr)
+            i++
+        }
+
+        return memo;
+    }
     // Create a reducing function iterating left or right.
+    /**
+     * 创建 reduce 函数的工厂
+     * @param {Number} dir reduce 类型 tag
+     *
+     * dir === 1 => reduce
+     * dir === -1 => reduceRight
+     */
     var createReduce = function (dir) {
         // Wrap code that reassigns argument variables in a separate function than
         // the one that accesses `arguments.length` to avoid a perf hit. (#1991)
         var reducer = function (obj, iteratee, memo, initial) {
+            // 数组和对象区别对待
             var keys = !isArrayLike(obj) && _.keys(obj),
                 length = (keys || obj).length,
+                // 判断是要生成 reduce 还是要生成 reduceRight
                 index = dir > 0 ? 0 : length - 1;
+
+            // 如果调用的时候没有传入初始值
+            // 选取迭代中第一个 item 作为初始值
             if (!initial) {
                 memo = obj[keys ? keys[index] : index];
                 index += dir;
             }
             for (; index >= 0 && index < length; index += dir) {
                 var currentKey = keys ? keys[index] : index;
+
+                // 经过加工的迭代函数, 本次返回值将作为下一次迭代的初始值
                 memo = iteratee(memo, obj[currentKey], currentKey, obj);
             }
             return memo;
         };
 
+        // reduce 方法或者 reduceRight 接收 4 个参数
+        // obj 待迭代的集合
+        // iteratee 迭代函数
+        // memo 迭代初始值
+        // context 迭代函数中的 this 指向
         return function (obj, iteratee, memo, context) {
+            // 这里用这个 initial 变量做一下判断的意思是, 如果你传入的 memo 是一个 falsy
+            // 的值直接判断其有无会存在误差, 以上手写的两个 reduce 就存在相关的问题
             var initial = arguments.length >= 3;
+
+            // optimizeCb argCount === 4 只有在这里用到了
             return reducer(obj, optimizeCb(iteratee, context, 4), memo, initial);
         };
     };
@@ -511,14 +595,47 @@
     _.reduceRight = _.foldr = createReduce(-1);
 
     // Return the first value which passes a truth test. Aliased as `detect`.
+    /**
+     * 找到数组 or 对象中第一个符合条件的元素(predicate返回 true)并返回该元素的值
+     * 对标 Array.prototype.find
+     * @param {Object|Array} obj 待查找的集合
+     * @param {any} predicate 真值检测函数
+     * @param {Object} context 真值检测函数(predicate)中的 this 指向
+     * @return {any} 第一个符合真值检测的元素
+     */
     _.find = _.detect = function (obj, predicate, context) {
         var keyFinder = isArrayLike(obj) ? _.findIndex : _.findKey;
         var key = keyFinder(obj, predicate, context);
         if (key !== void 0 && key !== -1) return obj[key];
     };
 
+    // 实现一个简易版本的 _.find
+    _.simpleFind = (arr, predicate, context) => {
+
+        if (!Array.isArray(arr)) throw new TypeError('参数类型错误~')
+
+        const len = arr.length;
+        let i = 0;
+
+        while (i < len) {
+            const currentItem = arr[i]
+            if (predicate.call(context, currentItem, i, arr)) {
+                return currentItem;
+            }
+            i++
+        }
+    }
+
     // Return all the elements that pass a truth test.
     // Aliased as `select`.
+    /**
+     * 找到数组 or 对象中符合条件的元素集合
+     * 对标 Array.prototype.filter
+     * @param {Object|Array} obj 待查找的集合
+     * @param {any} predicate 真值检测函数
+     * @param {Object} context 真值检测函数(predicate)中的 this 指向
+     * @returns {Array} 符合条件的元素组成的数组
+     */
     _.filter = _.select = function (obj, predicate, context) {
         var results = [];
         predicate = cb(predicate, context);
@@ -528,13 +645,32 @@
         return results;
     };
 
+    // 实现一个简易版本的 _.filter
+    _.simpleFilter = (arr, predicate, context) => {
+
+        if (!Array.isArray(arr)) throw new TypeError('参数类型错误~')
+
+        const ret = []
+        for (let i = 0, len = arr.length; i < len; i++) {
+            if (predicate.call(context, arr[i], i, arr)) {
+                ret.push(arr[i])
+            }
+        }
+        return ret
+    }
+
     // Return all the elements for which a truth test fails.
+    // 这个就是 _.filter 的反运算
+    // 所得的结果是 _.filter 的补集
     _.reject = function (obj, predicate, context) {
         return _.filter(obj, _.negate(cb(predicate)), context);
     };
 
     // Determine whether all of the elements match a truth test.
     // Aliased as `all`.
+    /**
+     * 对标 Array.prototype.every
+     */
     _.every = _.all = function (obj, predicate, context) {
         predicate = cb(predicate, context);
         var keys = !isArrayLike(obj) && _.keys(obj),
@@ -546,8 +682,24 @@
         return true;
     };
 
+    // 实现一个简易版本的 _.every
+    _.simpleEvery = (arr, predicate, context) => {
+
+        if (!Array.isArray(arr)) throw new TypeError('参数类型错误~')
+
+        for (let i = 0, len = arr.length; i < len; i++) {
+            if (!predicate.call(context, arr[i], i, arr)) {
+                return false
+            }
+        }
+        return true
+    }
+
     // Determine if at least one element in the object matches a truth test.
     // Aliased as `any`.
+    /**
+     * 对标 Array.prototype.some
+     */
     _.some = _.any = function (obj, predicate, context) {
         predicate = cb(predicate, context);
         var keys = !isArrayLike(obj) && _.keys(obj),
@@ -559,13 +711,42 @@
         return false;
     };
 
+    // 实现一个简易版本的 _.some
+    _.simpleSome = (arr, predicate, context) => {
+
+        if (!Array.isArray(arr)) throw new TypeError('参数类型错误~')
+
+        for (let i = 0, len = arr.length; i < len; i++) {
+            if (predicate.call(context, arr[i], i, arr)) {
+                return true
+            }
+        }
+        return false
+    }
+
     // Determine if the array or object contains a given item (using `===`).
     // Aliased as `includes` and `include`.
+    /**
+     * 对标 Array.prototype.includes
+     */
     _.contains = _.includes = _.include = function (obj, item, fromIndex, guard) {
         if (!isArrayLike(obj)) obj = _.values(obj);
         if (typeof fromIndex != 'number' || guard) fromIndex = 0;
         return _.indexOf(obj, item, fromIndex) >= 0;
     };
+
+    // 实现一个简易版本的 _.contains
+    _.simpleContains = (arr, item, fromIndex) => {
+
+        if (!Array.isArray(arr)) throw new TypeError('参数类型错误~')
+
+        for (let i = fromIndex, len = arr.length; i < len; i++) {
+            if (arr[i] === item) {
+                return true
+            }
+        }
+        return false
+    }
 
     // Invoke a method (with arguments) on every item in a collection.
     _.invoke = restArguments(function (obj, path, args) {
@@ -590,28 +771,80 @@
     });
 
     // Convenience version of a common use case of `map`: fetching a property.
+    /**
+     * 给一个集合, 遍历他, 返回指定 key 的值组成的值的集合
+     * @example
+     *       _.pluck([{name: 'qq'}, {name: 'gl'}], 'name') // ['qq', 'gl']
+     *
+     * // 我的印象里这个方法实现方式是这样的
+     * _.property = function(key) {
+     *    return function(obj) {
+     *        return obj === null ? undefined : obj[key]
+     *    }
+     * }
+     */
     _.pluck = function (obj, key) {
         return _.map(obj, _.property(key));
     };
 
     // Convenience version of a common use case of `filter`: selecting only objects
     // containing specific `key:value` pairs.
+    /**
+     * 类似于 sql 中的 where 字句
+     * @param {Array|Ojbect} obj 待检查的对象
+     * @param {Ojbect} attrs 检测对象
+     * @returns {Array} 符合条件的 item list
+     * @example
+     *      _.where([{name: 'qq', sex: 'male'}, {name: 'gl', sex: 'female'}], {name: 'qq', sex: 'male'})
+     *      // [{name: 'qq', sex: 'male'}]
+     */
     _.where = function (obj, attrs) {
         return _.filter(obj, _.matcher(attrs));
     };
 
     // Convenience version of a common use case of `find`: getting the first object
     // containing specific `key:value` pairs.
+    /**
+     * 查找集合中第一个符合匹配 where 字句的 item
+     * @param {Array|Ojbect} obj 待检查的对象
+     * @param {Ojbect} attrs 检测对象
+     * @returns {Object} 符合条件的 item
+     * @example
+     *      _.where([{name: 'qq', sex: 'male'}, {name: 'gl', sex: 'female'}], {name: 'qq', sex: 'male'})
+     *      // [{name: 'qq', sex: 'male'}]
+     */
     _.findWhere = function (obj, attrs) {
         return _.find(obj, _.matcher(attrs));
     };
 
     // Return the maximum element (or element-based computation).
+    /**
+     * 寻找数组中的最大值
+     * @param {Array|Object} 待比较集合
+     * @param {any} 元素比较依据
+     * @param {Object} 如果比较依据为 function 改参数为比较函数的 this 指向
+     *
+     */
     _.max = function (obj, iteratee, context) {
-        var result = -Infinity, lastComputed = -Infinity,
-            value, computed;
+        // 结果参数
+        var result = -Infinity,
+
+            // 最近一次比较的参数
+            lastComputed = -Infinity,
+
+            // 普通模式下每次迭代产生的值
+            value,
+
+            // 复杂模式下每次迭代产生的值
+            computed;
+
+        // 如果没有传入比较依据或者传入的比较依据是一个数字且集合中的元素不是对象
+        // 且集合不为空对象 就会进入简单模式 按值比较
         if (iteratee == null || typeof iteratee == 'number' && typeof obj[0] != 'object' && obj != null) {
+            // 如果是数组直接取 obj
+            // 否者取 obj 对象的值组成的数组
             obj = isArrayLike(obj) ? obj : _.values(obj);
+            // 迭代获取的数组
             for (var i = 0, length = obj.length; i < length; i++) {
                 value = obj[i];
                 if (value != null && value > result) {
@@ -619,7 +852,19 @@
                 }
             }
         } else {
+            // 复杂模式, 当比较依据传入了函数的时候执行
+            // 首先优化一下回调函数
             iteratee = cb(iteratee, context);
+            /**
+             * 这里稍微有点绕
+             * 首先遍历传入的待比较对象
+             * computed = iteratee(v, index, list); 这一句通过比较函数计算出一个可以比价的值
+             * 用刚刚计算出的值和之前计算出的最大值比较, 如果该值更大些吧结果标记替换为当前遍历到的
+             * item ps: 这里的 result 记录的时 obj 的成员 item 而不是通过比较依据计算出的比较值
+             * 最后返回 result
+             * 最后讲一句: 如果传入的 obj == null(可能就没有传入这个参数), 那么进入了复杂模式, 但是
+             * 遍历根本没有走所以返回的 result 就是预定的处置 -Infinity
+             */
             _.each(obj, function (v, index, list) {
                 computed = iteratee(v, index, list);
                 if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
@@ -632,6 +877,7 @@
     };
 
     // Return the minimum element (or element-based computation).
+    // 参照 _.max 实现的思路类似
     _.min = function (obj, iteratee, context) {
         var result = Infinity, lastComputed = Infinity,
             value, computed;
@@ -657,6 +903,7 @@
     };
 
     // Shuffle a collection.
+    // 乱序数组
     _.shuffle = function (obj) {
         return _.sample(obj, Infinity);
     };
@@ -684,27 +931,81 @@
     };
 
     // Sort the object's values by a criterion produced by an iteratee.
+    /**
+     * 根据给定的规则排序
+     * @param {Array|Object} obj 待排序集合
+     * @param {any} iteratee 指定排序规则
+     * @param {Object} context 排序规则为 function 时 this 指向
+     * @returns {Object} 排序后数组
+     * @example
+     *      _.sortBy([1, 3, 2], item => item * item)
+     *         // 首先, 给他 map 一把, 根据指定的排序规则给每个 item 生成排序的依据
+     *         // _.map => [
+     *         //  {value: 1, index: 0, criteria: 1},
+     *         //  {value: 3, index: 1, criteria: 9},
+     *         //  {value: 2, index: 2, criteria: 4},
+     *         // ]
+     *         // 其次, 排个序(根据 map 环节生成的排序依据)
+     *         // _.sort => [
+     *         //   {value: 1, index: 0, criteria: 1},
+     *         //   {value: 2, index: 2, criteria: 4},
+     *         //   {value: 3, index: 1, criteria: 9},
+     *         // ]
+     *         // 最后就是执行这样一个东西了
+     *         _.pluck([{}, {}, {}], 'value') => [1, 2, 3]
+     *         // pluck 方法的实现(这个功能和 lodash 的 _.pick 方法是一样的)
+     *         // _.pluck = function(obj, key) {
+     *         //   return _.map(obj, _.property(key));
+     *         // };
+     * @since 现在看看这个东西挺简单的, 但是在尚德时候自己写一个按照一定规则给对象 item 形式的
+     * 数组排序还是花了我很多很多时间的
+     */
     _.sortBy = function (obj, iteratee, context) {
+        // 位置标记, 用于记录每个 item 在原集合中的初始位置
         var index = 0;
+
+        // 优化迭代函数
         iteratee = cb(iteratee, context);
+
+        // map: 通过迭代函数给每个 item 添加用于比较的属性
+        // sort: 根据用于比价的属性排序 obj
+        // pluck: 提取排序后集合的 value 属性, 组成排序后的数组
         return _.pluck(_.map(obj, function (value, key, list) {
             return {
                 value: value,
                 index: index++,
+                // 通过比较函数, 为每一个 item 创建一个比较依据参数
                 criteria: iteratee(value, key, list)
             };
         }).sort(function (left, right) {
             var a = left.criteria;
             var b = right.criteria;
+
+            // 如果两个元素的比较属性不相等, 通过其比较属性进行排序
             if (a !== b) {
                 if (a > b || a === void 0) return 1;
                 if (a < b || b === void 0) return -1;
             }
+
+            // 如果两个 item 计算出的比较属性相同, 那么以他们在原集合中的顺序进行排序
             return left.index - right.index;
+
+            // 最后提取排序完的集合的 value
         }), 'value');
     };
 
     // An internal function used for aggregate "group by" operations.
+    /**
+     * 内部方法 用于对集合进行分组
+     * @param {Function} behavior 分组规则
+     * @param {*} partition
+     * @memberof
+     *  groupBy
+     *  indexBy
+     *  countBy
+     *  partition
+     * 看到这里, 有点激动, 这个应该属于高阶函数. 真么想到 js 还可以这么写...
+     */
     var group = function (behavior, partition) {
         return function (obj, iteratee, context) {
             var result = partition ? [[], []] : {};
@@ -719,12 +1020,41 @@
 
     // Groups the object's values by a criterion. Pass either a string attribute
     // to group by, or a function that returns the criterion.
+    /**
+     * 把一个集合分组为多个集合, 通过 iterator 返回的结果进行分组. 如果 iterator 是一个字符串
+     * 而不是函数, 那么将使用 iterator 作为各元素的属性名来对比进行分组.
+     *
+     * 这里直接执行的是 group 函数
+     * @example
+     * _.groupBy([1.3, 2.1, 2.4], function(num){ return Math.floor(num); });
+     * // => {1: [1.3], 2: [2.1, 2.4]}
+     *
+     * _.groupBy(['one', 'two', 'three'], 'length');
+     * // => {3: ["one", "two"], 5: ["three"]}
+     */
     _.groupBy = group(function (result, value, key) {
-        if (has(result, key)) result[key].push(value); else result[key] = [value];
+        // 如果分组结果中已经存在当前分组向分组中添加 value
+        if (has(result, key))
+            result[key].push(value);
+        else
+            // 否则在结果集中新建一个分组, 并把当前的 value 作为新分组的第一个元素
+            result[key] = [value];
     });
 
     // Indexes the object's values by a criterion, similar to `groupBy`, but for
     // when you know that your index values will be unique.
+    /**
+     * 给定一个list, 和一个用来返回一个在列表中的每个元素键的 iterator 函数（或属性名）,
+     * 返回一个每一项索引的对象, 和 groupBy 非常像, 但是当你知道你的键是唯一的时候可以使用 indexBy
+     * @example
+     *   var stooges = [{name: 'moe', age: 40}, {name: 'larry', age: 50}, {name: 'curly', age: 60}];
+     *   _.indexBy(stooges, 'age');
+     *   // => {
+     *   //    "40": {name: 'moe', age: 40},
+     *   //    "50": {name: 'larry', age: 50},
+     *   //    "60": {name: 'curly', age: 60}
+     *   //}
+     */
     _.indexBy = group(function (result, value, key) {
         result[key] = value;
     });
@@ -732,31 +1062,108 @@
     // Counts instances of an object that group by a certain criterion. Pass
     // either a string attribute to count by, or a function that returns the
     // criterion.
+    /**
+     * 排序一个列表组成多个组, 并且返回各组中的对象的数量的计数。类似groupBy,
+     * 但是不是返回列表的值, 而是返回在该组中值的数目. 就是统计某个集合中符合某种条件的元素的个数
+     * 的方法
+     * @example
+     *  _.countBy([1, 2, 3, 4, 5], function(num) {
+     *     return num % 2 == 0 ? 'even': 'odd';
+     * });
+     * // => {odd: 3, even: 2}
+     */
     _.countBy = group(function (result, value, key) {
-        if (has(result, key)) result[key]++; else result[key] = 1;
+        if (has(result, key))
+            result[key]++;
+        else
+            result[key] = 1;
     });
 
+    // 下边这个正则, 我不知道他的用处, 但是搜到了这个 https://www.zhihu.com/question/38324041
     var reStrSymbol = /[^\ud800-\udfff]|[\ud800-\udbff][\udc00-\udfff]|[\ud800-\udfff]/g;
+
     // Safely create a real, live array from anything iterable.
+    // anything to array
     _.toArray = function (obj) {
+        // 如果你啥都么有传 返回一个空数组
         if (!obj) return [];
+
+        // 如果是数组(很纯的那种数组)
+        // 返回传入数组的一个副本
         if (_.isArray(obj)) return slice.call(obj);
+
+        // 如果是一个字符串, 就用到了刚刚那个正则
+        // 我还是不知道那几个集合的意思
+        // 反正 match 一把带 g 的正则, 就能把字符串匹配的东西变成一个数组
+        // 我猜着两个竖线应该是区别了字符的几种集合
+        // 来一个例子
+        // reg1 = /[1|2|3]/
+        // /[1|2|3]/
+        // reg2 = /1|2|3/g
+        // /1|2|3/g
+        // a = '122131213213213323123123'
+        // "122131213213213323123123"
+        // a.match(reg1)
+        // 不带 g 的时候返回的是匹配的详情, 且只匹配第一个
+        // ["1", index: 0, input: "122131213213213323123123", groups: undefined]
+        // a.match(reg2)
+        // 带 g 的时候返回的时匹配的所有项的数组
+        // ["1", "2", "2", "1", "3", "1", "2", "1", "3", "2", "1", "3", "2", "1", "3", "3", "2", "3", "1", "2", "3", "1", "2", "3"]
         if (_.isString(obj)) {
             // Keep surrogate pair characters together
             return obj.match(reStrSymbol);
         }
+
+        // 如果是一个类数组对象使用 map 方法
+        // 这里为什么不和数组的处理方法合并一下直接用 slice.call 一下呢
+        // 自问自答: _.identity 可以用户自定义......
         if (isArrayLike(obj)) return _.map(obj, _.identity);
+
+        // 其他情况尝试获取对象属性值组成的数组
         return _.values(obj);
     };
 
     // Return the number of elements in an object.
+    /**
+     * 获取集合的长度
+     * @param {Array|Object} obj 待获取长度的集合
+     * @return {Number} 集合的长度
+     */
     _.size = function (obj) {
+        // 传入空值 null undefined '' NaN
         if (obj == null) return 0;
-        return isArrayLike(obj) ? obj.length : _.keys(obj).length;
+        return isArrayLike(obj)
+            // 如果传入一个数组 or 类数组对象返回其元素的个数
+            ? obj.length
+            // 如果传入一个对象返回对象 key 的个数
+            : _.keys(obj).length;
     };
 
     // Split a collection into two arrays: one whose elements all satisfy the given
     // predicate, and one whose elements all do not satisfy the predicate.
+    /**
+     * 拆分一个数组（array）为两个数组: 第一个数组其元素都满足predicate迭代函数,
+     * 而第二个的所有元素均不能满足predicate迭代函数
+     *
+     * _.partition([0, 1, 2, 3, 4, 5], isOdd);
+     * => [[1, 3, 5], [0, 2, 4]]
+     *
+     * 这里用到了 group 且传入了第二个参数, 这个时候需要 iteratee 返回的时 bool 值
+     * 回顾一下 group
+     *
+     *   group = function(behavior, partition) {
+     *    return function(obj, iteratee, context) {
+     *      iteratee = cb(iteratee, context)
+     *      // 缓存结果
+     *      var result = partition ? [[], []] : {}
+     *      _.each(obj, function(value, index, obj) {
+     *        var key = iteratee(value, index, obj)
+     *        behavior(result, value, key)
+     *      })
+     *     return result
+     *    }
+     *  }
+     */
     _.partition = group(function (result, value, pass) {
         result[pass ? 0 : 1].push(value);
     }, true);

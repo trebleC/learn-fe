@@ -1174,6 +1174,10 @@
     // Get the first element of an array. Passing **n** will return the first N
     // values in the array. Aliased as `head` and `take`. The **guard** check
     // allows it to work with `_.map`.
+    /**
+     * 返回array （数组）的第一个元素。
+     * 传递 n参数将返回数组中从第一个元素开始的n个元素（注：返回数组中前 n 个元素.）
+     */
     _.first = _.head = _.take = function (array, n, guard) {
         if (array == null || array.length < 1) return n == null ? void 0 : [];
         if (n == null || guard) return array[0];
@@ -1183,12 +1187,26 @@
     // Returns everything but the last entry of the array. Especially useful on
     // the arguments object. Passing **n** will return all the values in
     // the array, excluding the last N.
+    /**
+     * 返回数组中除了最后一个元素外的其他全部元素。 在arguments对象上特别有用。
+     * 传递 n参数将从结果中排除从最后一个开始的n个元素（注：排除数组后面的 n 个元素）。
+     * 解释在上边的方法
+     */
     _.initial = function (array, n, guard) {
-        return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
+        return slice.call(array, 0, Math.max(0, array.length - (n == null || guard
+            // n 没有值返回 1, length - 1 截取除了最后一个元素的元素
+            ? 1
+            // n 有值返回 n 就变成了 n, length - n 截取前 n 个元素
+            : n
+        )));
     };
 
     // Get the last element of an array. Passing **n** will return the last N
     // values in the array.
+    /**
+     * 返回array（数组）中最后一个元素。传递 n参数将返回数组中从最后一个元素开始的n个元素
+     * （注：返回数组里的后面的n个元素）。
+     */
     _.last = function (array, n, guard) {
         if (array == null || array.length < 1) return n == null ? void 0 : [];
         if (n == null || guard) return array[array.length - 1];
@@ -1198,31 +1216,61 @@
     // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
     // Especially useful on the arguments object. Passing an **n** will return
     // the rest N values in the array.
+    // 给定一个数组剔除掉第一个值
+    // 如果传了 n 那么就剔除掉前 n 个
     _.rest = _.tail = _.drop = function (array, n, guard) {
         return slice.call(array, n == null || guard ? 1 : n);
     };
 
     // Trim out all falsy values from an array.
+    // 给定一个数组剔除掉数组中所有的假值
+    // false null NaN undefined 0 ''
     _.compact = function (array) {
         return _.filter(array, Boolean);
     };
 
     // Internal implementation of a recursive `flatten` function.
+    /**
+     * 数组降维 内部方法, 把二维 or 多维数组降维成一维数组
+     * @param {Array} input 待降维的数组
+     * @param {Bool} shallow 是否为浅降维(多重数组时候是否递归降维)
+     * @param {Bool} strict 是否为严格模式(严格模式下,是输入的 input 必须是数组)
+     * @param {Array} output 输出数组
+     * @returns {Array} 降维后的数组
+     */
     var flatten = function (input, shallow, strict, output) {
+        // 存储结果
         output = output || [];
+
+        // 结果的下一个下标
+        // 这个变量的主要意义就是要兼容深层次 flatten 的数组
         var idx = output.length;
+
+        // 迭代待降维数组
         for (var i = 0, length = getLength(input); i < length; i++) {
             var value = input[i];
+
+            // 如果当前项是一个数组或者类数组
             if (isArrayLike(value) && (_.isArray(value) || _.isArguments(value))) {
                 // Flatten current level of array or arguments object.
+                // 如果是浅降维, 直接把当前 item 包含的元素添加到结果数组中
+                // ex: [1, 2, [1, [1, 2]]] => [1, 2, 1, [1, 2]]
                 if (shallow) {
                     var j = 0, len = value.length;
                     while (j < len) output[idx++] = value[j++];
                 } else {
+                    // 如果是深降维, 就要递归调用降维函数直到把数组元素内的元素放平了为止
                     flatten(value, shallow, strict, output);
+
+                    // 这里这个可能会有疑问, 递归调用的时候不是在上边第二行代码定义了 idx 变量了吗
+                    // 这里为啥要重新赋值?
+                    // 这里建议看一下 这篇文章, 此不赘述: https://github.com/mqyqingfeng/Blog/issues/3
+                    // ps: 这个老哥写的文章很好
                     idx = output.length;
                 }
             } else if (!strict) {
+                // 否则查看是否是严格模式如果不是严格模式直接把当前元素添加到结果数组里
+                // 严格模式的话, 要求输入的值必须是数组, 就应该走到上边的判断里边了
                 output[idx++] = value;
             }
         }
@@ -1230,11 +1278,14 @@
     };
 
     // Flatten out an array, either recursively (by default), or just one level.
+    // 数组降维 外部方法
     _.flatten = function (array, shallow) {
         return flatten(array, shallow, false);
     };
 
     // Return a version of the array that does not contain the specified value(s).
+    // 数组开除方法, 从第一个参数的数组中开除掉后边的元素, 返回新数组
+    // _.without([1,2,3,1,4], 1, 4)  => [2, 3]
     _.without = restArguments(function (array, otherArrays) {
         return _.difference(array, otherArrays);
     });
@@ -1245,26 +1296,72 @@
     // is not a one-to-one function, so providing an iteratee will disable
     // the faster algorithm.
     // Aliased as `unique`.
+    /**
+     * 数组去重
+     * @param {Array} array 待去重的数组
+     * @param {Boolean} isSorted 待去重数组是否已经排序, 如果数组已经排序的话各个元素只需要和
+     *   它的前一个元素相比即可更快
+     * @param {Any} iteratee 迭代器, 如果传入了这个参数则会对每个元素执行这个方法利用得
+     *    到的值进行比较, 否则的话直接拿元素进行比较
+     * @param {Object} context 迭代器的执行上下文
+     */
     _.uniq = _.unique = function (array, isSorted, iteratee, context) {
+        // 参数检测一把
+        // 如果 isSorted 参数不是布尔值, 认为用户没有传入这个参数, 第二个参数为迭代器
+        // isSorted 取默认值 false
         if (!_.isBoolean(isSorted)) {
             context = iteratee;
             iteratee = isSorted;
             isSorted = false;
         }
+
+        // 老生常谈-看会了 cb 方法 underscore 源码读懂了三分之一
         if (iteratee != null) iteratee = cb(iteratee, context);
+
+        // 缓存结果
         var result = [];
         var seen = [];
+
+        // 数组操作肯定是 for 大爷先来跑个循环
         for (var i = 0, length = getLength(array); i < length; i++) {
             var value = array[i],
-                computed = iteratee ? iteratee(value, i, array) : value;
+                // 构建比较标记 iteratee 是用来判断生成比价函数的
+                // 比如当前的 value 是一个 obj 同时有身高体重...
+                // 这个 iteratee 就是要告诉我们是要比身高还是比体重
+                // 最后把需要比的依据放在了 computed 里边
+                computed = iteratee
+                    // 如果传入了 iteratee 则用 iteratee 处理得到比较标记
+                    ? iteratee(value, i, array)
+                    // 否则用原值进行比较
+                    : value;
+            // 注释中的 icon 表示 isSorted 和 iteratee
+            // 首先, 如果数组时已经排过序的 且没有传入 iteratee(按元素值比较)
+            // ✅ ❎
             if (isSorted && !iteratee) {
-                if (!i || seen !== computed) result.push(value);
+                if (
+                    // 如果 !i === true 说明 i === 0
+                    // 数组第一个元素肯定是没有重复的元素的直接推入结果数组
+                    !i
+
+                    // 如果 seen !== computed 说明还没有见过当前这个元素, 添加到结果数组
+                    || seen !== computed
+                ) result.push(value);
+
+                // 因为这里的数组已经排序, 所以 seen 只需要记住最近一次见到的元素
                 seen = computed;
+                // 其次如果传入了 iteratee(按加工后的比较标记比较)
+                // ✅||❎  ✅
             } else if (iteratee) {
+                // 如果没有见到过当前的比较标记, 说明当前这个元素还没有遇到过, 把当前比较标记放到
+                // seen 数组里(哈哈哈哈我看到你啦)
+                // 然后把数组元素值放到结果数组里
                 if (!_.contains(seen, computed)) {
                     seen.push(computed);
                     result.push(value);
                 }
+
+            // 最后, 如果没有传迭代函数 且 么有排序
+            // ❎ ❎
             } else if (!_.contains(result, value)) {
                 result.push(value);
             }
@@ -1274,22 +1371,40 @@
 
     // Produce an array that contains the union: each distinct element from all of
     // the passed-in arrays.
+    // 取数组的并集
+    // 最后利用 restArguments 包装一下子, 任你传多少个数组进来统统通吃
     _.union = restArguments(function (arrays) {
-        return _.uniq(flatten(arrays, true, true));
+        // 其次去重
+        return _.uniq(
+            // 首先把数组浅降维
+            flatten(arrays, true, true)
+        );
     });
 
     // Produce an array that contains every item shared between all the
     // passed-in arrays.
+    /**
+     * 数组的交集运算
+     * @param {Arrays} array 这里的参数应该是一堆的数组
+     * @returns {Array} 返回传入的数组中都包含的元素组成的数组
+     */
     _.intersection = function (array) {
         var result = [];
         var argsLength = arguments.length;
+        // 遍历传入的第一个数组
         for (var i = 0, length = getLength(array); i < length; i++) {
             var item = array[i];
+            // 如果结果数组中已经存在了当前元素继续
             if (_.contains(result, item)) continue;
             var j;
+            // 遍历其他参数
             for (j = 1; j < argsLength; j++) {
+                // 如果其他参数数组中有一个不包含当前元素 -> 跳出
                 if (!_.contains(arguments[j], item)) break;
             }
+
+            // 如果其余的参数数组中也都包含当前元素, 说明当前传入的所有数组中都存在这个元素
+            // 把它推入结果数组中
             if (j === argsLength) result.push(item);
         }
         return result;
@@ -1297,8 +1412,19 @@
 
     // Take the difference between one array and a number of other arrays.
     // Only the elements present in just the first array will remain.
+    /**
+     * 数组差集运算 返回第一个参数数组中存在但是其他的数组参数中都不存在的 item
+     *
+     * 首先搞一个 restArguments 让函数变成一个具备 rest 函数参数能力的函数
+     * ex: _.difference([1,2,3,4], [2,2,3,4], [3,2,3,4], [4,2,3,4])
+     */
     _.difference = restArguments(function (array, rest) {
+        // 给 rest 参数降维
+        // [[2,2,3,4], [3,2,3,4], [4,2,3,4]] => [2,2,3,4,3,2,3,4,4,2,3,4]
         rest = flatten(rest, true, true);
+
+        // 通过 filter 配合 contains 过滤出 第一个参数数组中存在但是其他数组中不存在的
+        // 各种元素
         return _.filter(array, function (value) {
             return !_.contains(rest, value);
         });
@@ -1306,6 +1432,11 @@
 
     // Complement of _.zip. Unzip accepts an array of arrays and groups
     // each array's elements on shared indices.
+    /**
+     * 给定若干 arrays，返回一串联的新数组，其第一元素个包含所有的输入数组的第一元素，
+     * 其第二包含了所有的第二元素，依此类推。通过 apply 用于传递数组的数组
+     * 感觉这个方法应该是用来处理矩阵的
+     */
     _.unzip = function (array) {
         var length = array && _.max(array, getLength).length || 0;
         var result = Array(length);
@@ -1318,17 +1449,40 @@
 
     // Zip together multiple lists into a single array -- elements that share
     // an index go together.
+    // 上边的方法的反运算
+    // 这个方法接收的参数是这样的 _.zip([1,2,3], [4,5,6], [7,8,9])
+    // 利用了 restArguments 包裹一下就相当于是给 _.unzip 这样传参
+    // _.unzip([[1,2,3], [4,5,6], [7,8,9]])
+    // 剩下的参照上边的解释吧
     _.zip = restArguments(_.unzip);
 
     // Converts lists into objects. Pass either a single array of `[key, value]`
     // pairs, or two parallel arrays of the same length -- one of keys, and one of
     // the corresponding values. Passing by pairs is the reverse of _.pairs.
+    /**
+     * 将数组转换为对象。传递任何一个单独[key, value]对的列表，或者一个键的列表和一个值得列表。
+     * 如果存在重复键，最后一个值将被返回。
+     * @example
+     *  _.object(['moe', 'larry', 'curly'], [30, 40, 50]);
+     * => {moe: 30, larry: 40, curly: 50}
+     *
+     * _.object([['moe', 30], ['larry', 40], ['curly', 50]]);
+     * => {moe: 30, larry: 40, curly: 50}
+     */
     _.object = function (list, values) {
+        // 结果对象
         var result = {};
+
+        // 遍历传入的待处理 list
         for (var i = 0, length = getLength(list); i < length; i++) {
+
+            // 如果传入了第二个参数, 说明本次传入了两个数组, 第一个是 key 的集合, 第二个是值的集合
+            // 直接把键值按照一一对应的方式写入到结果对象
             if (values) {
                 result[list[i]] = values[i];
             } else {
+                // 否则认为用户传入了一个二维数组
+                // 遍历过程中每个子数组的第一项为 key, 第二项为值
                 result[list[i][0]] = list[i][1];
             }
         }
@@ -1336,14 +1490,27 @@
     };
 
     // Generator function to create the findIndex and findLastIndex functions.
+    /**
+     * 内部方法, 用户构建 findIndex 和 findLastIndex
+     * @param {Number} dir 查找方向
+     *  1 就是从前往后找(findIndex),
+     *  -1 就是从后往前找(findLastIndex)
+     */
     var createPredicateIndexFinder = function (dir) {
         return function (array, predicate, context) {
             predicate = cb(predicate, context);
             var length = getLength(array);
+
+            // findIndex 起始位置 0
+            // findLastIndex 起始位置 数组中最后一个元素的位置
             var index = dir > 0 ? 0 : length - 1;
+
+            // for 循环找到符合 predicate 函数的 item 并返回该 item 的下标
             for (; index >= 0 && index < length; index += dir) {
                 if (predicate(array[index], index, array)) return index;
             }
+
+            // 没有找到符合条件的 item 返回 -1
             return -1;
         };
     };
@@ -1354,18 +1521,50 @@
 
     // Use a comparator function to figure out the smallest index at which
     // an object should be inserted so as to maintain order. Uses binary search.
+
+    /**
+     * 使用二分查找确定 value 在 list 中的位置序号，value按此序号插入能保持list原有的排序。
+     * 如果提供iterator函数，iterator将作为list排序的依据，包括你传递的value 。
+     * iterator也可以是字符串的属性名用来排序(比如length)
+     * @param {Array} array 已排序的数组
+     * @param {any} obj 待插入的东西
+     * @param {any} iteratee 数组的排序依据
+     * @param {Object} context iteratee 执行上下文
+     * @returns {Number} 该元素应该插入的位置
+     */
     _.sortedIndex = function (array, obj, iteratee, context) {
         iteratee = cb(iteratee, context, 1);
+
+        // 根据排序依据对待插入的对象生成一个排序标量
         var value = iteratee(obj);
+
+        // 因为用到了二分法, 定义一个最低位和一个最高位
         var low = 0, high = getLength(array);
         while (low < high) {
+            // 获取中间变量
             var mid = Math.floor((low + high) / 2);
-            if (iteratee(array[mid]) < value) low = mid + 1; else high = mid;
+
+            // 如果当前中间位的元素比较标量小于带插入变量生成的比较标量
+            // 说明待插入的元素应该在中间变量的右侧
+            if (iteratee(array[mid]) < value)
+                low = mid + 1;
+
+            // 否则待插入元素在中间变量的左侧
+            else
+                high = mid;
         }
         return low;
     };
 
     // Generator function to create the indexOf and lastIndexOf functions.
+    /**
+     * 内部方法, 用户构建 indexOf 和 lastIndexOf
+     * @param {Number} dir 查询方向
+     *  1 从前往后
+     *  -1 从后往前
+     * @param {Function} predicateFind 查找函数
+     * @param {Function} sortedIndex
+     */
     var createIndexFinder = function (dir, predicateFind, sortedIndex) {
         return function (array, item, idx) {
             var i = 0, length = getLength(array);
@@ -1400,18 +1599,47 @@
     // Generate an integer Array containing an arithmetic progression. A port of
     // the native Python `range()` function. See
     // [the Python documentation](https://docs.python.org/library/functions.html#range).
+    /**
+     * 一个用来创建整数灵活编号的列表的函数，便于 each 和 map 循环。如果省略 start 则默认为 0；
+     * step 默认为 1.返回一个从start 到stop的整数的列表，用step来增加 （或减少）独占。
+     * 值得注意的是，如果stop值在start前面（也就是stop值小于start值），那么值域会被认为是零长度，
+     * 而不是负增长。-如果你要一个负数的值域 ，请使用负数step.
+     * @param {Number} start 起始值
+     * @param {Number} stop 结束值
+     * @param {Number} step 步进值
+     * @example
+     * _.range(10);
+     * => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+     * _.range(1, 11);
+     * => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+     * _.range(0, 30, 5);
+     * => [0, 5, 10, 15, 20, 25]
+     * _.range(0, -10, -1);
+     * => [0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
+     * _.range(0);
+     * => []
+     */
     _.range = function (start, stop, step) {
+
+        // 首先校验参数如果没有传入第二个参数默认第一个参数就是 stop
+        // 此时 start 默认值为 0
         if (stop == null) {
             stop = start || 0;
             start = 0;
         }
+
+        // 如果没有传入步进值
+        // 如果 stop 小于 start 说明获取数组为逐渐变小型数组 step 默认取 -1
+        // 否则 step 取 1, 获取的数组为逐渐变大型数组
         if (!step) {
             step = stop < start ? -1 : 1;
         }
 
+        // 获取 range 数组的长度
         var length = Math.max(Math.ceil((stop - start) / step), 0);
         var range = Array(length);
 
+        // 构造数组
         for (var idx = 0; idx < length; idx++ , start += step) {
             range[idx] = start;
         }
@@ -1421,12 +1649,26 @@
 
     // Chunk a single array into multiple arrays, each containing `count` or fewer
     // items.
+    /**
+     * 把一个大数组 切割成小数组, 如果最后一个小数组片段切分时长度不够 count
+     * 直接把剩余的部分作为最后一个小数组
+     * @param {Array} array 待切割的数组
+     * @param {Number} count 切割后的每个小数组的长度
+     * @returns {Array} 返回小数组的集合
+     */
     _.chunk = function (array, count) {
+        // 如果没有传入小数组的长度或者传入的小数组的长度小于 1(没法切割),直接返回空数组
         if (count == null || count < 1) return [];
+
+        // 保存返回小数组的集合
         var result = [];
         var i = 0, length = array.length;
         while (i < length) {
-            result.push(slice.call(array, i, i += count));
+            // 然后推到结果数组中
+            result.push(
+                // 把元素组切割成一个个的小数组
+                slice.call(array, i, i += count)
+            );
         }
         return result;
     };

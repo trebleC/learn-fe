@@ -97,7 +97,7 @@
     /**
      * 基础构造函数
      * @param {any} obj 初始化参数
-     * @ex
+     * @eg
      * _(1)
      * 第一遍执行由于 obj === 1 所以 obj instanceof _ === false
      * this === window (浏览器中) 故 this instanceof _ === false 取反 === true
@@ -137,35 +137,89 @@
     // the browser, add `_` as a global object.
     // (`nodeType` is checked to ensure that `module`
     // and `exports` are not HTML elements.)
+    // 把刚刚定义的 _ 变量挂载到根(global)上
+    // 其实, 这个就是人们通常说的所谓对外暴露.
+
+    // typeof exports != 'undefined' 一般可以认为就是 node 环境了, 但是如果你在 html 中
+    // 添加一个 id="exports" 的 dom 节点, 浏览器会在全局环境创建一个 exports 变量且改变量指
+    // 向刚刚添加的节点对象, 因此添加了后边的 !exports.nodeType 判断, 节点对象定存在 nodeType
+    // 属性, 但 node 环境下的 exports 没有该属性, 此处的判断简直妙及
     if (typeof exports != 'undefined' && !exports.nodeType) {
+
+        // 这里的 module.nodeType 判断原因和上文的 exports.nodeType 判断一致
+        // 存在 module.exports 时为 commonjs 2.0 版本
         if (typeof module != 'undefined' && !module.nodeType && module.exports) {
             exports = module.exports = _;
         }
+
+        // 如果没有 module.exports 默认当前环境为 node 的 commonjs 1.0 版本, 直接把 _ 挂载到
+        // exports 上即可
         exports._ = _;
     } else {
+        // 没有定义 exports 变量, 或者 exports 变量存在 nodeType(浏览器添加 id 为 exports 节点)
+        // 属性的时候认为这个当前环境是浏览器环境, 直接把 _ 挂载到根对象上
+        // 就像是 window._ = _ 这就把 _ 放到 window 上作为 window 的属性啦~
         root._ = _;
     }
 
-    // Current version.
+    // Current version. 当前版本~
     _.VERSION = '1.9.2';
 
     // Internal function that returns an efficient (for current engines) version
     // of the passed-in callback, to be repeatedly applied in other Underscore
     // functions.
+    // ps: 看这个方法之前先看下边的 cb 函数会好理解一些
+
+    // 这个函数的意思就是让回调函数能牛逼一点
+    // 比如, 函数式方法的时候可以搞进来不同个数的参数
     var optimizeCb = function (func, context, argCount) {
+
+        // 没有指定上下文直接返回该回调函数, 回调函数中 this 指向全局变量
         if (context === void 0) return func;
+
+        // 根据迭代器函数需要的参数的个数执行指定迭代器
+        // 这个意思是默认值为 3
         switch (argCount == null ? 3 : argCount) {
+
+            // 一个参数 _.times
             case 1: return function (value) {
                 return func.call(context, value);
             };
             // The 2-argument case is omitted because we’re not using it.
+
+            // 绑定了 context 但是没有指定参数的个数 _.map => cb => 这里
             case 3: return function (value, index, collection) {
                 return func.call(context, value, index, collection);
             };
+
+            // 四个参数 _.reduce、_.reduceRight
             case 4: return function (accumulator, value, index, collection) {
                 return func.call(context, accumulator, value, index, collection);
             };
         }
+
+        // 看到了结尾突然来了这么一句, 有点懵逼了. 前边 switch case 了半天不是有这一句就搞定了吗
+        // 当然是, 但是为什么作者要这样写多此一举呢?
+        // 是因为 call 的执行效率比 apply 要快很多, 相比之下简直算得上是快的飞起
+        // 不行你控制台执行一下下边这段代码
+        // function work(a, b, c) {}
+        // var a = [1, 2, 3];
+        // for (var j = 0; j < 5; j++) {
+        //   console.time('apply');
+        //   for (var i = 0; i < 1000000; i++) {
+        //     work.apply(this, a);
+        //   }
+        //   console.timeEnd('apply');
+        //   console.time('call');
+        //   for (var i = 0; i < 1000000; i++) {
+        //     work.call(this, 1, 2, 3);
+        //   }
+        //   console.timeEnd('call');
+        // }
+        // 具体细节参考:
+        // https://segmentfault.com/q/1010000007894513
+        // http://www.ecma-international.org/ecma-262/5.1/#sec-15.3.4.3
+        // http://www.ecma-international.org/ecma-262/5.1/#sec-15.3.4.4
         return function () {
             return func.apply(context, arguments);
         };
@@ -176,11 +230,47 @@
     // An internal function to generate callbacks that can be applied to each
     // element in a collection, returning the desired result — either `identity`,
     // an arbitrary callback, a property matcher, or a property accessor.
+    /**
+     * 回调函数优化
+     * @param {Function|String|Object|Array} value 回调函数 or 属性访问器 or 属性匹配器
+     * @param {Object} context 上下文对象, 也就是回调函数里边的 this
+     * @param {Number} argCount 参数个数
+     * @eg1 _.map([1,2,3]) // [1,2,3] 不传入 iteratee 参数, 直接返回传入的 obj
+     * @eg2 _.map([1,2,3], (i) => i * i) // [1, 4, 9] iteratee 参数传入一个函数征程处理
+     *      和 Array.prototype.map 处理方案一致
+     * @eg3 _.map([{name: 'qq'}, {name: 'gl', age: 18}], {name: 'qq'}) // [true, false]
+     *      iteratee 参数传入一个对象字面量 (高大上名字叫属性匹配器) 返回元素是否能匹配指定属性
+     *      匹配器的数组
+     * @eg4 _.map([{name: 'qq'}, {name: 'gl', age: 18}], 'name') // ['qq', 'gl']
+     *      iteratee 参数传入一个字符串 (高大上的名字叫属性访问器) 返回 obj 中各个元素对应的属
+     *      性值的数组
+     * @eg5 _.map([{sport: {like: 'football'}}, {sport: {like: 'basketball'}}], ['sport', 'like'])
+     *      // ['football', 'basketball']
+     *      不说了自己体会吧, 就像是按照数组的路径取出了这个玩意儿一样, 好嗨哟
+     * @eg6
+     *    看下边这一段代码 _.iteratee = builtinIteratee 来说 _.iteratee !== builtinIteratee
+     *    应该始终是 false 不会执行的, 但是如果用户在外部手动重写了 _.iteratee 函数(注意:
+     *    builtinIteratee 不会被重写因为这个变量根本没有向外暴露)
+     *    第一步: 重写 _.iteratee 代码在这里 https://github.com/luoquanquan/underscore/blob/analysis/demos/cb.html
+     *    第二步: 添加两个 _.map 方法
+     *    此时, cb 函数就会运行至 return _.iteratee(value, context); 也就是说如果用户(开发者)
+     *    重写了 _.iteratee 方法, 此处会直接调用开发者定义的方法
+     *    ps: 重写该方法会影响很多 underscore 的方法, 包括 map、find、filter、reject、every、some、max、min、sortBy、groupBy、indexBy、countBy、sortedIndex、partition、和 unique
+     */
     var cb = function (value, context, argCount) {
+        // 对应 @eg6 用户重写了 _.iteratee
         if (_.iteratee !== builtinIteratee) return _.iteratee(value, context);
+
+        // @eg1 _.map 没有传入第二个参数
         if (value == null) return _.identity;
+
+        // @eg2 当用户传入的第二个参数为一个函数时执行逻辑和 map 等同
         if (_.isFunction(value)) return optimizeCb(value, context, argCount);
+
+        // @eg3 传入一个对象字面量(属性匹配器)
         if (_.isObject(value) && !_.isArray(value)) return _.matcher(value);
+
+        // 其他情况 @eg4, @eg5
         return _.property(value);
     };
 

@@ -351,12 +351,29 @@
     };
 
     // An internal function for creating a new object that inherits from another.
+    /**
+     * 创建一个继承自 prototype 的对象
+     * @param {Object} prototype 原型对象
+     * @return 创建的对象
+     * @use _.create executeBound
+     */
     var baseCreate = function (prototype) {
+        // 如果没有传入原型, 或者传入的原型非对象字面量, 直接返回空对象
         if (!_.isObject(prototype)) return {};
+
+        // 如果当前环境支持原生的 Object.create 直接调用原生方法
         if (nativeCreate) return nativeCreate(prototype);
+
+        // 家中常备, 手写实现 new
         Ctor.prototype = prototype;
+
+        // 创建实例, 此时 result.__proto__ === prototype
         var result = new Ctor;
+
+        // 修正还原 Ctor 的原型
         Ctor.prototype = null;
+
+        // 返回创建的新对象
         return result;
     };
 

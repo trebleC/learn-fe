@@ -286,25 +286,66 @@
     // on. This helper accumulates all remaining arguments past the function’s
     // argument length (or an explicit `startIndex`), into an array that becomes
     // the last argument. Similar to ES6’s "rest parameter".
+
+    /**
+     * 通过高阶函数使得函数具备 restArguments 的能力
+     * @param {Function} func 需要 rest 参数的函数
+     * @param {Number} startIndex 从哪个参数起开始算作 rest 参数, 如果不指定默认为最后一个参数
+     * @returns {Function} 返回一个具备 restArguments 参数能力的函数
+     */
     var restArguments = function (func, startIndex) {
-        startIndex = startIndex == null ? func.length - 1 : +startIndex;
+        // rest 参数起始位置
+        startIndex = startIndex == null
+            // 如果没有传入该参数, 默认是函数最后一个参数
+            // func.length 这个问题就是这样
+            // function a(x, y, z) {}
+            // console.log(a.length) // 3
+            // 函数对象的 length 属性就是该函数定义时预定的形参的个数
+            // 这个 js 权威指南 上有提到
+            ? func.length - 1
+
+            // 如果传了此参数从传入的值开始算, ➕的意思是强转数字
+            : +startIndex;
+
+        // 返回的函数
         return function () {
+            // arguments 是你调用这个函数的时候实际传入的函数的个数
+            // 升级一下刚刚的函数 a
+            // function a(x, y, z) { console.log(arguments.length) }
+            // a 函数期待拿到 3 个参数
+            // 但是 a(1,2) // 2
+            // 只传入两个参数的话函数也可以正常执行. 只是真实 arguments.length === 2
+            // 这一行的意思定义一个 rest 参数数组, 但是防止你传入的实参个数比定义的 startIndex 还要
+            // 小的情况保证 rest 参数数组的长度不能为负数 😹
             var length = Math.max(arguments.length - startIndex, 0),
+
+                // 创建 rest 参数数组
                 rest = Array(length),
+
+                // for 循环步进变量
                 index = 0;
             for (; index < length; index++) {
+                // 把真实参数中超过 startIndex 位的参数赋值到 rest 参数数组上
                 rest[index] = arguments[index + startIndex];
             }
+
+            // 这个结构就不赘述了
+            // 这样做的原因是 call 速度比 apply 简直快到飞起
             switch (startIndex) {
                 case 0: return func.call(this, rest);
                 case 1: return func.call(this, arguments[0], rest);
                 case 2: return func.call(this, arguments[0], arguments[1], rest);
             }
             var args = Array(startIndex + 1);
+
+            // 这一块, 因为 apply 参数传入一个数组所以需要拼接一下 apply 的参数
+            // 并把 rest 参数作为参数数组的最后一个元素
             for (index = 0; index < startIndex; index++) {
                 args[index] = arguments[index];
             }
             args[startIndex] = rest;
+
+            // 初始参数个数大于 3 个的时候使用 apply 调用函数
             return func.apply(this, args);
         };
     };

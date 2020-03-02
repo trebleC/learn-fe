@@ -2154,6 +2154,8 @@
     // ----------------
 
     // Keys in IE < 9 that won't be iterated by `for key in ...` and thus missed.
+    // IE < 9 以下的版本不能用 for - in 遍历 obj 的部分 keys(例如: 重写对象的 toString 方法)
+    // IE < 9 以下的版本 以下判断会返回 true
     var hasEnumBug = !{ toString: null }.propertyIsEnumerable('toString');
     var nonEnumerableProps = ['valueOf', 'isPrototypeOf', 'toString',
         'propertyIsEnumerable', 'hasOwnProperty', 'toLocaleString'];
@@ -2177,31 +2179,83 @@
 
     // Retrieve the names of an object's own properties.
     // Delegates to **ECMAScript 5**'s native `Object.keys`.
+    /**
+     * 提取出对象的所有 keys (enumerable properties)组成数组并返回, 不能获取对象原型上的属性
+     * @param {Object} obj 待提取 key 值的对象
+     * @return {Array} 对象的所有 key 值组成的数组
+     *
+     * @example
+     *   function A() {}
+     *   A.prototype.girlfriend = 'xixi'
+     *   var obj = new A()
+     *   obj.name = 'quanquan'
+     *   obj.friend = 'guiling'
+     *   _.keys(obj) // ['name', 'friend']
+     */
     _.keys = function (obj) {
+        // 如果传入的参数不是一个对象直接返回空数组
         if (!_.isObject(obj)) return [];
+
+        // 如果当前执行环境兼容原生的 keys 方法直接调用原生的方法
+        // Object.keys
         if (nativeKeys) return nativeKeys(obj);
+
+        // 创建结果数组
         var keys = [];
+
+        // 通过 for in 迭代 obj 的所有 key
+        // 并把 obj 的自有 key 推入结果数组
         for (var key in obj) if (has(obj, key)) keys.push(key);
+
         // Ahem, IE < 9.
+        // 如果当前执行环境小于 IE9 则 patch 一下可能有问题(重写之后仍然无法迭代到)的部分 key
         if (hasEnumBug) collectNonEnumProps(obj, keys);
         return keys;
     };
 
     // Retrieve all the property names of an object.
+    /**
+     * 获取对象属性, 并返回由对象的属性组成的数组, 本方法即能获取对象自有的属性, 也能获取对象原型
+     * 的属性
+     * @param {Object} 待提取属性的对象
+     * @returns {Array} 对象属性名组成的数组
+     * @example
+     *   function A() {}
+     *   A.prototype.girlfriend = 'ruhua'
+     *   var obj = new A()
+     *    obj.name = 'quanquan'
+     *    _.allKeys(obj) // ['girlfriend', 'name']
+     */
     _.allKeys = function (obj) {
+        // 如果传入的参数不是一个对象直接返回空数组
         if (!_.isObject(obj)) return [];
         var keys = [];
+        // 凡是能用 for in 迭代出的对象的属性统统添加到结果
+        // 数组(包括对象自有属性(enumerable properties)和对象原型属性)
         for (var key in obj) keys.push(key);
+
         // Ahem, IE < 9.
+        // 兼容运行环境小于 ie 9 时存在的重写了对象部分原型方法以后无法通过 for in 遍历出的问题
         if (hasEnumBug) collectNonEnumProps(obj, keys);
         return keys;
     };
 
     // Retrieve the values of an object's properties.
+    /**
+     * 提取对象自有属性的值, 并放到数组中返回
+     * ps: 仅仅能获取到对象自有属性值, 不能获取原型属性值
+     *
+     * 对比 _.keys 方法
+     */
     _.values = function (obj) {
+        // 首先获取对象所有自有的 key
         var keys = _.keys(obj);
         var length = keys.length;
+
+        // 创建结果数组
         var values = Array(length);
+
+        // 循环遍历 keys 数组, 把对象每一个 key 对应的值放到结果数组中
         for (var i = 0; i < length; i++) {
             values[i] = obj[keys[i]];
         }
@@ -2210,11 +2264,36 @@
 
     // Returns the results of applying the iteratee to each element of the object.
     // In contrast to _.map it returns an object.
+    /**
+     * 一个可以用在对象上的 map 方法
+     * @param {Object} obj 待迭代对象
+     * @param {any} iteratee 迭代方法
+     * @param {Object} context 迭代方法上下文对象(就是方法执行时内部的 this 指向)
+     * @returns {Object} map 以后的方法
+     * @example
+     *   var obj = {
+     *      name: 'qq',
+     *      friend: 'gl'
+     *   }
+     *   _.mapObject(obj, (v, k, obj) => {
+     *      if(k === 'name') {
+     *          return 'bt'
+     *      }
+     *      return v
+     *   })
+     *   // {name: "bt", friend: "gl"}
+     */
     _.mapObject = function (obj, iteratee, context) {
+        // 优化迭代方法
         iteratee = cb(iteratee, context);
+
+        // 获取对象所有的 keys
         var keys = _.keys(obj),
             length = keys.length,
             results = {};
+
+        // 遍历对象的所有 keys, 对对象的每一个成员执行一把迭代方法
+        // 把执行后的值放到结果对象上
         for (var index = 0; index < length; index++) {
             var currentKey = keys[index];
             results[currentKey] = iteratee(obj[currentKey], currentKey, obj);
@@ -2224,6 +2303,20 @@
 
     // Convert an object into a list of `[key, value]` pairs.
     // The opposite of _.object.
+    /**
+     * 把一个对象转化成一个二维数组
+     * @param {Object} obj 待拆分的对象
+     * @returns {Array} 拆分后的数组
+     *
+     * @example
+     *  var obj = {
+     *    name: 'qq',
+     *    friend: 'ruhua'
+     *  }
+     * _.pairs(obj) // [['name', 'qq'], ['friend', 'ruhua']]
+     *
+     * 一目了然
+     */
     _.pairs = function (obj) {
         var keys = _.keys(obj);
         var length = keys.length;
@@ -2235,6 +2328,18 @@
     };
 
     // Invert the keys and values of an object. The values must be serializable.
+    /**
+     * 翻转对象的 key 和 value, 你必须保证你的 values 必须可以序列化成字符串
+     * 这个方法真的调皮
+     * @param {Ojbect} obj 待翻转的对象
+     * @returns {Object} obj 翻转后的对象
+     * @example
+     *    var obj = {
+     *       name: 'qq',
+     *       friend: 'ruhua'
+     *    }
+     *    _.invert(obj) // {qq: "name", ruhua: "friend"}
+     */
     _.invert = function (obj) {
         var result = {};
         var keys = _.keys(obj);
@@ -2246,6 +2351,12 @@
 
     // Return a sorted list of the function names available on the object.
     // Aliased as `methods`.
+    /**
+     * 这个方法很奇怪, 就是要把对象上边的方法名字(包括自有方法和原型上的方法)提取出来, 放到一个数组里
+     * 然后在把这些方法名排个序 --------- 我还么有用到过
+     * @param {Object} obj 待提取方法的数组
+     * @returns {Array} 对象的方法名排序后的数组
+     */
     _.functions = _.methods = function (obj) {
         var names = [];
         for (var key in obj) {
@@ -2259,14 +2370,30 @@
         return function (obj) {
             var length = arguments.length;
             if (defaults) obj = Object(obj);
+            // 如果传入的参数的个数小于 2
+            // 或者传入的第一个参数为 falsy 的值
+            // 直接返回第一个参数
             if (length < 2 || obj == null) return obj;
+
+            // 遍历第二个参数开始的剩余参数
             for (var index = 1; index < length; index++) {
+
+                // 提取参数
                 var source = arguments[index],
+
+                    // 经典, 通过动态的方式获取对象的 keys list
+                    // 实现获取对象自有属性和包含原型属性的提取
                     keys = keysFunc(source),
                     l = keys.length;
+                // 二重遍历, 提取参数对象中的各个成员
                 for (var i = 0; i < l; i++) {
                     var key = keys[i];
-                    if (!defaults || obj[key] === void 0) obj[key] = source[key];
+                    if (
+                        // 如果没有启用 default
+                        !defaults
+                        // 当前对象没有指定的属性
+                        || obj[key] === void 0
+                    ) obj[key] = source[key];
                 }
             }
             return obj;
@@ -2274,6 +2401,20 @@
     };
 
     // Extend a given object with all the properties in passed-in object(s).
+    /**
+     * 扩展对象
+     * 会把第二个参数及以后的参数的属性(包括原型继承来的)拷贝到第一个参数对象上
+     * @example
+     *  var obj = {}
+     *  var a = {a: 1}
+     *  var b = {b: 2}
+     *  function C() {}
+     *  C.prototype.c = 3
+     *  var c = new C
+     *  _.extend(obj, a, b, c)
+     *  // 既拷贝了对象的自有属性, 也拷贝了对象从原型上继承来的属性
+     *  console.log(obj) // {a: 1, b: 2: c: c}
+     */
     _.extend = createAssigner(_.allKeys);
 
     // Assigns a given object with all the own properties in the passed-in object(s).
@@ -2281,8 +2422,29 @@
     _.extendOwn = _.assign = createAssigner(_.keys);
 
     // Returns the first key on an object that passes a predicate test.
+    /**
+     * 这个对比 Array.prototype.findIndex
+     * @param {Array|Object} obj 待查找的对象
+     * @param {any} predicate 检测方法
+     * @param {Object} context 当检测方法为函数时其执行上下文
+     * @returns {String} 符合条件的 key 值
+     *
+     * @example
+     *  var obj = {
+     *    name: 'quanquan',
+     *    sex: 'male',
+     *    age: 26
+     *  }
+     *  var func = (item) => {
+     *      return item === 26
+     *  }
+     * _.findKey(obj, func) // 'age'
+     */
     _.findKey = function (obj, predicate, context) {
+        // 优化检测条件, 使得检测条件不仅仅可以兼容函数
         predicate = cb(predicate, context);
+
+        // 获取待查找对象所有的 keys
         var keys = _.keys(obj), key;
         for (var i = 0, length = keys.length; i < length; i++) {
             key = keys[i];
@@ -2296,26 +2458,63 @@
     };
 
     // Return a copy of the object only containing the whitelisted properties.
+    /**
+     * 把对象中有用的几个属性提取出来
+     * @example
+     *  var obj = {
+     *     name: 'quanquan',
+     *     sex: 'male',
+     *     age: 26
+     * }
+     *
+     * _.pick(obj, 'name', 'sex')
+     * // {name: "quanquan", sex: "male"}
+     * _.pick(obj, (v, k) => k === 'sex')
+     * // {sex: "male"}
+     * _.pick(obj, ['name', 'sex'])
+     * // {name: "quanquan", sex: "male"}
+     */
     _.pick = restArguments(function (obj, keys) {
         var result = {}, iteratee = keys[0];
         if (obj == null) return result;
+
+        // 如果第二个参数传入的是一个函数
         if (_.isFunction(iteratee)) {
+
+            // 如果传入了第三个参数, 则认为传入了函数执行时的上下文
             if (keys.length > 1) iteratee = optimizeCb(iteratee, keys[1]);
+
+            // 获取对象所有的 keys
             keys = _.allKeys(obj);
         } else {
+            // 如果传入的第二个参数不是一个函数
+            // 真值函数传入默认的 keyInObj
             iteratee = keyInObj;
+
+            // 此时后边传入的参数 keys 可能是一个数组, 也可能是一个个挨着的 keys list
+            // 给他降维一波
             keys = flatten(keys, false, false);
+
+            // 保证 obj 是一个对象
             obj = Object(obj);
         }
+
+        // 遍历一波
         for (var i = 0, length = keys.length; i < length; i++) {
+            // 取出当前的 key
             var key = keys[i];
+
+            // 取出当前 key 在 obj 中对应的成员
             var value = obj[key];
+
+            // 如果真值函数判断 ok 就把当前的值放到结果集合中
             if (iteratee(value, key, obj)) result[key] = value;
         }
         return result;
     });
 
     // Return a copy of the object without the blacklisted properties.
+    // 这个就是 _.pick 的补集操作
     _.omit = restArguments(function (obj, keys) {
         var iteratee = keys[0], context;
         if (_.isFunction(iteratee)) {
@@ -2331,18 +2530,35 @@
     });
 
     // Fill in a given object with default properties.
+    // 用 defaults 对象填充 object 中的undefined属性. 并且返回这个object
+    // 一旦这个属性被填充, 再使用 defaults 方法将不会有任何效果
     _.defaults = createAssigner(_.allKeys, true);
 
     // Creates an object that inherits from the given prototype object.
     // If additional properties are provided then they will be added to the
     // created object.
+    /**
+     * 创建一个对象(指定原型和自有属性)
+     * @param {Object} prototype 指定的原型对象
+     * @param {Object} props 默认的自有属性
+     * @example
+     *  var a = {name: 'a'}
+     *  var b = {sex: 'male'}
+     *  var c = _.create(a, b)
+     *  console.log(c)  // {"sex": "male"}
+     *  console.log(c.name) // a
+     */
     _.create = function (prototype, props) {
+        // 创建指定原型的对象
         var result = baseCreate(prototype);
+
+        // 绑定自有属性
         if (props) _.extendOwn(result, props);
         return result;
     };
 
     // Create a (shallow-cloned) duplicate of an object.
+    // 浅拷贝
     _.clone = function (obj) {
         if (!_.isObject(obj)) return obj;
         return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
@@ -2351,12 +2567,17 @@
     // Invokes interceptor with the obj, and then returns obj.
     // The primary purpose of this method is to "tap into" a method chain, in
     // order to perform operations on intermediate results within the chain.
+    /**
+     * 用 object作为参数来调用函数interceptor，然后返回object。这种方法的主要意图是作为函数
+     * 链式调用 的一环, 为了对此对象执行操作并返回对象本身
+     */
     _.tap = function (obj, interceptor) {
         interceptor(obj);
         return obj;
     };
 
     // Returns whether an object has a given set of `key:value` pairs.
+    // 告诉你 properties 中的键和值是否包含在 object 中
     _.isMatch = function (object, attrs) {
         var keys = _.keys(attrs), length = keys.length;
         if (object == null) return !length;
@@ -2369,7 +2590,7 @@
     };
 
 
-    // Internal recursive comparison function for `isEqual`.
+    // Internal(内部) recursive(递归) comparison(比较) function for `isEqual`.
     var eq, deepEq;
     eq = function (a, b, aStack, bStack) {
         // Identical objects are equal. `0 === -0`, but they aren't identical.
@@ -2476,36 +2697,56 @@
     };
 
     // Perform a deep comparison to check if two objects are equal.
+    // 深比较两个值是否相等
     _.isEqual = function (a, b) {
         return eq(a, b);
     };
 
     // Is a given array, string, or object empty?
     // An "empty" object has no enumerable own-properties.
+    /**
+     * 判断传入的值是否为一个 "空" 值
+     * @example
+     *  _.isEmpty([]) // true
+     *  _.isEmpty({}) // true
+     *  _.isEmpty('') // true
+     *  _.isEmpty(NaN) // true
+     *  _.isEmpty(false) // true
+     *  _.isEmpty(document.all) // true
+     */
     _.isEmpty = function (obj) {
+        // falsy 的值认为是一个空值
+        // NaN false null undefined 0 document.all '' ""
         if (obj == null) return true;
         if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0;
         return _.keys(obj).length === 0;
     };
 
     // Is a given value a DOM element?
+    // 判断一个对象是否是一个 dom 元素
     _.isElement = function (obj) {
         return !!(obj && obj.nodeType === 1);
     };
 
     // Is a given value an array?
     // Delegates to ECMA5's native Array.isArray
+    // 判断一个变量是否是一个数组
     _.isArray = nativeIsArray || function (obj) {
         return toString.call(obj) === '[object Array]';
     };
 
     // Is a given variable an object?
+    // 判断一个变量是否是一个对象
     _.isObject = function (obj) {
         var type = typeof obj;
-        return type === 'function' || type === 'object' && !!obj;
+        // 函数式对象
+        return type === 'function' || type === 'object'
+            // 排除 null
+            && !!obj;
     };
 
     // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError, isMap, isWeakMap, isSet, isWeakSet.
+    // 常用的类型的判断
     _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error', 'Symbol', 'Map', 'WeakMap', 'Set', 'WeakSet'], function (name) {
         _['is' + name] = function (obj) {
             return toString.call(obj) === '[object ' + name + ']';
@@ -2530,11 +2771,13 @@
     }
 
     // Is a given object a finite number?
+    // 判断一个变量是否是一个有效的数字
     _.isFinite = function (obj) {
         return !_.isSymbol(obj) && isFinite(obj) && !isNaN(parseFloat(obj));
     };
 
     // Is the given value `NaN`?
+    // 判断一个变量是不是 NaN
     _.isNaN = function (obj) {
         return _.isNumber(obj) && isNaN(obj);
     };

@@ -2814,33 +2814,54 @@
         return !!length;
     };
 
-    // TODO Utility Functions
     // Utility Functions
     // -----------------
 
     // Run Underscore.js in *noConflict* mode, returning the `_` variable to its
     // previous owner. Returns a reference to the Underscore object.
+    // 防止和其他需要占用 _ 变量的库的冲突
     _.noConflict = function () {
         root._ = previousUnderscore;
         return this;
     };
 
     // Keep the identity function around for default iteratees.
+    // 这个函数很有趣 === a => a
     _.identity = function (value) {
         return value;
     };
 
     // Predicate-generating functions. Often useful outside of Underscore.
+    /**
+     * 返回一个函数, 这个函数永远返回当前传入的值
+     * @param {any} value 待常量化的变量
+     * @return {Function} 始终返回当前变量的函数
+     * @example
+     *  var a = _.constant(1)
+     *  var obj = {name: 'quanquan'}
+     *  var cObj = _.constant(obj)
+     *  console.log(a) // 1
+     *  console.log(cObj === obj) // true
+     */
     _.constant = function (value) {
         return function () {
             return value;
         };
     };
 
+    // 空函数, 一般用作回调函数的默认值
     _.noop = function () { };
 
     // Creates a function that, when passed an object, will traverse that object’s
     // properties down the given `path`, specified as an array of keys or indexes.
+    /**
+     * 返回一个函数, 用于获取对象指定的属性
+     * @example
+     * var obj = {name: 'quanquan'}
+     * var getName = _.property('name')
+     * var name = getName(obj)
+     * console.log(name) // quanquan
+     */
     _.property = function (path) {
         if (!_.isArray(path)) {
             return shallowProperty(path);
@@ -2851,6 +2872,14 @@
     };
 
     // Generates a function for a given object that returns a given property.
+    /**
+     * 返回一个函数, 用于获取指定对象的属性
+     * @example
+     * var obj = {name: 'quanquan', sex: 'female'}
+     * var getQuanqaun = _.propertyOf(obj)
+     * console.log(getQuanqaun('name')) // quanquan
+     * console.log(getQuanqaun('sex')) // female
+     */
     _.propertyOf = function (obj) {
         if (obj == null) {
             return function () { };
@@ -2862,6 +2891,15 @@
 
     // Returns a predicate for checking whether an object has a given set of
     // `key:value` pairs.
+    /**
+     * 返回一个函数, 判断给定的对象是否包含给定的键值对, 也就是包不包含给定的对象
+     * @example
+     * var func = _.matcher({name: 'quanquan', sex: 'female'})
+     * var qq = {name: 'quanquan', sex: 'female', age: 26}
+     * var yl = {name: 'yanlei', sex: 'male', age: 29}
+     * func(qq) // true
+     * func(yl) // false
+     */
     _.matcher = _.matches = function (attrs) {
         attrs = _.extendOwn({}, attrs);
         return function (obj) {
@@ -2870,6 +2908,7 @@
     };
 
     // Run a function **n** times.
+    // 把一个函数跑 n 遍, 并且返回每次执行该函数返回的结果组成的数组
     _.times = function (n, iteratee, context) {
         var accum = Array(Math.max(0, n));
         iteratee = optimizeCb(iteratee, context, 1);
@@ -2878,6 +2917,10 @@
     };
 
     // Return a random integer between min and max (inclusive).
+    /**
+     * 获取一个介于 min-max 之间的随机整数
+     * [min, max] 闭区间
+     */
     _.random = function (min, max) {
         if (max == null) {
             max = min;
@@ -2887,11 +2930,13 @@
     };
 
     // A (possibly faster) way to get the current timestamp as an integer.
+    // 返回当前时间戳
     _.now = Date.now || function () {
         return new Date().getTime();
     };
 
     // List of HTML entities for escaping.
+    // html 转码 (avoid xss) 字符集合
     var escapeMap = {
         '&': '&amp;',
         '<': '&lt;',
@@ -3057,12 +3102,41 @@
     };
 
     // Add your own custom functions to the Underscore object.
+    /**
+     * 拓展方法
+     * 可以基于此函数拓展你的 underscore
+     * @param {Ojbect} 要拓展的对象字面量
+     * @returns {Object} underscore 主体对象
+     *
+     * @example
+     * // 假如我们要添加一系列 quanquan 方法
+     * var obj = {
+     *  sayHello: function(name) {
+     *    if (name == null) throw new Error('i will say Hello to guy?')
+     *    return "hello " + name
+     *  }
+     * }
+     *
+     * _.mixin(obj)
+     * _.sayHello('jianchuang') // hello jianchuang
+     */
     _.mixin = function (obj) {
+        // 首先把 obj 对象成员中的所有函数都拿出来
         _.each(_.functions(obj), function (name) {
+
+            // 把方法挂接在 _ 上, 以后就可以这样调用了 _.sayHello
             var func = _[name] = obj[name];
+
+            // 把方法挂接在 _ 对象的原型上, 就可以这样 _().sayHello()
             _.prototype[name] = function () {
+
+                // 挂载方法调用时候的 this
                 var args = [this._wrapped];
+
+                // 挂载方法调用时传入的其他参数
                 push.apply(args, arguments);
+
+                // 对挂载的方法提供链式调用支持
                 return chainResult(this, func.apply(_, args));
             };
         });
@@ -3070,9 +3144,11 @@
     };
 
     // Add all of the Underscore functions to the wrapper object.
+    // 把上边定义的所有工具方法(挂接在 _ 上边的方法)拓展到 _ 包装 {_wrapper: obj}对象上
     _.mixin(_);
 
     // Add all mutator Array functions to the wrapper.
+    // 数组对象原型方法添加到 underscore 中, 这些方法会改变原数组
     _.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function (name) {
         var method = ArrayProto[name];
         _.prototype[name] = function () {
@@ -3084,6 +3160,7 @@
     });
 
     // Add all accessor Array functions to the wrapper.
+    // 数组对象原型方法添加到 underscore 中, 这些方法不会改变原数组
     _.each(['concat', 'join', 'slice'], function (name) {
         var method = ArrayProto[name];
         _.prototype[name] = function () {
@@ -3092,6 +3169,7 @@
     });
 
     // Extracts the result from a wrapped and chained object.
+    // 取出 underscore 包装过的对象的值
     _.prototype.value = function () {
         return this._wrapped;
     };
@@ -3111,6 +3189,7 @@
     // popular enough to be bundled in a third party lib, but not be part of
     // an AMD load request. Those cases could generate an error when an
     // anonymous define() is called outside of a loader request.
+    // AMD 方式导出 underscore
     if (typeof define == 'function' && define.amd) {
         define('underscore', [], function () {
             return _;

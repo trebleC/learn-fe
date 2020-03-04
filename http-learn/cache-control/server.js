@@ -30,7 +30,7 @@ http.createServer((request, response) => {
     if (url === '/script.js') {
         response.writeHead(200, {
             'Content-Type': 'text/javascritp',
-            'Cache-Control': 'max-age=20'
+            'Cache-Control': 'max-age=200'
         })
 
         response.end('console.log("script loaded~")')

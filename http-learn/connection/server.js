@@ -21,7 +21,8 @@ http.createServer((request, response) => {
 
     if (url.startsWith('/test')) {
         response.writeHead(200, {
-            'Content-Type': 'image/jpg'
+            'Content-Type': 'image/jpg',
+            Connection: 'close'
         })
 
         response.end(img)

@@ -33,7 +33,7 @@ http.createServer((request, response) => {
             'Cache-Control': 'max-age=200'
         })
 
-        response.end('console.log("script loaded~")')
+        response.end('console.log("new script loaded~")')
     }
 }).listen(conf.PORT, () => {
     console.log(`the server is running on ${conf.PORT}`)
